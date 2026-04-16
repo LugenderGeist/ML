@@ -4,7 +4,7 @@ import warnings
 warnings.filterwarnings('ignore')
 
 from src.decision_tree import train_decision_tree, evaluate_model, save_model, visualize_tree, print_feature_importance
-from src.utils import save_metrics, print_metrics_table
+from src.utils import save_metrics
 
 
 def load_params(config_path='params.yaml'):
@@ -15,9 +15,6 @@ def load_params(config_path='params.yaml'):
 
 
 def main():
-    print("=" * 80)
-    print("🌳 ДЕРЕВО РЕШЕНИЙ")
-    print("=" * 80)
     
     # Загрузка параметров
     params = load_params()
@@ -37,7 +34,6 @@ def main():
     
     # Оценка
     metrics, importance = evaluate_model(model, X_train, X_val, X_test, y_train, y_val, y_test, features)
-    print_metrics_table(metrics, "Дерево решений")
     print_feature_importance(importance, top_n=8)
     
     # Визуализация

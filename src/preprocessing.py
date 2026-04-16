@@ -12,23 +12,7 @@ def normalize_features(
     X_test: pd.DataFrame,
     method: str = 'standard'
 ) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, object]:
-    """
-    Нормализация признаков
-    
-    Parameters:
-    -----------
-    X_train, X_val, X_test : pd.DataFrame
-        Данные для нормализации
-    method : str
-        Метод нормализации: 'standard', 'minmax', 'robust'
-    
-    Returns:
-    --------
-    X_train_norm, X_val_norm, X_test_norm : pd.DataFrame
-        Нормализованные данные
-    scaler : object
-        Обученный скейлер
-    """
+
     if method == 'standard':
         scaler = StandardScaler()
     elif method == 'minmax':
@@ -51,19 +35,14 @@ def normalize_features(
     return X_train_scaled, X_val_scaled, X_test_scaled, scaler
 
 def save_scaler(scaler: object, save_path: str = 'models/scaler.pkl'):
-    """Сохранение скейлера"""
     os.makedirs(os.path.dirname(save_path), exist_ok=True)
     joblib.dump(scaler, save_path)
-    print(f"💾 Скейлер сохранен: {save_path}")
-
 
 def load_scaler(load_path: str = 'models/scaler.pkl') -> object:
-    """Загрузка скейлера"""
     return joblib.load(load_path)
 
 
 def add_normalization_params(params: Dict[str, Any]) -> Dict[str, Any]:
-    """Добавляет параметры нормализации в словарь параметров"""
     if 'preprocessing' not in params:
         params['preprocessing'] = {}
     

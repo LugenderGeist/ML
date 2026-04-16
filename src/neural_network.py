@@ -11,6 +11,11 @@ import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras import layers, callbacks
 
+import warnings
+warnings.filterwarnings('ignore')
+
+import logging
+logging.getLogger('tensorflow').setLevel(logging.ERROR)
 
 def set_seed(random_state: int = 42):
     """Фиксация seed для воспроизводимости результатов"""
@@ -22,21 +27,6 @@ def build_neural_network(
     input_dim: int,
     params: Dict[str, Any]
 ) -> keras.Model:
-    """
-    Построение архитектуры нейронной сети
-    
-    Parameters:
-    -----------
-    input_dim : int
-        Количество входных признаков
-    params : dict
-        Параметры модели из params.yaml
-    
-    Returns:
-    --------
-    keras.Model
-        Собранная модель
-    """
     model = keras.Sequential()
     
     # Входной слой + первый скрытый слой
@@ -74,7 +64,6 @@ def build_neural_network(
     
     return model
 
-
 def train_neural_network(
     X_train: pd.DataFrame,
     y_train: pd.Series,
@@ -83,36 +72,11 @@ def train_neural_network(
     params: Dict[str, Any],
     verbose: bool = False
 ) -> Tuple[keras.Model, None]:
-    """
-    Обучение нейронной сети (данные уже нормализованы в main.py!)
-    
-    Parameters:
-    -----------
-    X_train, X_val : pd.DataFrame
-        Данные для обучения и валидации (УЖЕ нормализованные)
-    y_train, y_val : pd.Series
-        Целевые переменные
-    params : dict
-        Параметры модели
-    verbose : bool
-        Показывать ли вывод обучения
-    
-    Returns:
-    --------
-    keras.Model
-        Обученная модель
-    None
-        Вместо scaler (нормализация выполняется в main.py)
-    """
     print("\n🧠 Обучение нейронной сети (TensorFlow/Keras)...")
     
     # Фиксация seed для воспроизводимости
     set_seed(params.get('random_state', 42))
     
-    # Данные уже нормализованы в main.py, поэтому просто используем их
-    # Никакой дополнительной нормализации здесь не делаем!
-    
-    # Построение модели
     model = build_neural_network(X_train.shape[1], params)
     
     # Early stopping для предотвращения переобучения
@@ -142,10 +106,7 @@ def train_neural_network(
         verbose=1 if verbose else 0
     )
     
-    print(f"✅ Модель обучена (эпох: {len(history.history['loss'])})")
-    
-    return model, None  # Возвращаем None вместо scaler
-
+    return model, None
 
 def evaluate_model(
     model: keras.Model,
@@ -157,10 +118,7 @@ def evaluate_model(
     y_test: pd.Series,
     feature_names: list
 ) -> Tuple[Dict[str, Dict[str, float]], pd.DataFrame]:
-    """
-    Оценка качества модели (данные уже нормализованы)
-    """
-    # Предсказания (данные уже нормализованы)
+    
     y_train_pred = model.predict(X_train, verbose=0).flatten()
     y_val_pred = model.predict(X_val, verbose=0).flatten()
     y_test_pred = model.predict(X_test, verbose=0).flatten()
@@ -202,24 +160,16 @@ def evaluate_model(
 
 
 def save_model(model: keras.Model, scaler: None, save_path: str = 'models/neural_network.keras'):
-    """
-    Сохранение модели в файл (scaler не сохраняется, т.к. нормализация в main.py)
-    """
     os.makedirs(os.path.dirname(save_path), exist_ok=True)
     model.save(save_path)
     print(f"💾 Модель сохранена: {save_path}")
 
 
 def load_model(load_path: str = 'models/neural_network.keras') -> keras.Model:
-    """Загрузка модели из файла"""
     return keras.models.load_model(load_path)
 
 
 def print_feature_importance(feature_importance: pd.DataFrame, top_n: int = 8):
-    """Вывод информации о признаках для нейросети"""
     print("\n📊 Информация о признаках:")
     print("-" * 55)
     print("   ⚠️ Для нейронных сетей сложно интерпретировать важность признаков")
-    print("   💡 Веса модели распределены по всем нейронам")
-    print(f"   📊 Всего признаков: {len(feature_importance)}")
-    print("   🎯 Рекомендуется использовать другие модели для анализа важности")

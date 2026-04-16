@@ -4,8 +4,21 @@ import warnings
 warnings.filterwarnings('ignore')
 
 from src.neural_network import train_neural_network, evaluate_model, save_model, print_feature_importance
-from src.utils import save_metrics, print_metrics_table
+from src.utils import save_metrics
 
+import os
+import warnings
+import logging
+
+# Отключаем системные warnings
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
+
+# Отключаем Python warnings
+warnings.filterwarnings('ignore')
+
+# Отключаем логирование TensorFlow
+logging.getLogger('tensorflow').setLevel(logging.ERROR)
 
 def load_params(config_path='params.yaml'):
     import yaml
@@ -15,9 +28,6 @@ def load_params(config_path='params.yaml'):
 
 
 def main():
-    print("=" * 80)
-    print("🧠 НЕЙРОННАЯ СЕТЬ")
-    print("=" * 80)
     
     # Загрузка параметров
     params = load_params()
@@ -37,7 +47,6 @@ def main():
     
     # Оценка
     metrics, importance = evaluate_model(model, X_train, X_val, X_test, y_train, y_val, y_test, features)
-    print_metrics_table(metrics, "Нейронная сеть")
     print_feature_importance(importance, top_n=8)
     
     # Сохранение

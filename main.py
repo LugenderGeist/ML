@@ -16,7 +16,7 @@ from src.catboost_model import train_catboost, evaluate_model as evaluate_cb, sa
 from src.xgboost_model import train_xgboost, evaluate_model as evaluate_xgb, save_model as save_xgb, print_feature_importance as print_xgb_importance
 from src.neural_network import train_neural_network, evaluate_model as evaluate_nn, save_model as save_nn, print_feature_importance as print_nn_importance
 from src.preprocessing import normalize_features, save_scaler, add_normalization_params
-from src.utils import save_metrics, print_metrics_table, select_all_features, prepare_data_for_training
+from src.utils import save_metrics, select_all_features, prepare_data_for_training
 
 def load_params(config_path='params.yaml'):
     import yaml
@@ -57,11 +57,6 @@ def main():
     df = df.dropna()
     rows_removed = initial_rows - len(df)
     
-    if rows_removed > 0:
-        print(f"🗑️ Удалено пропусков: {rows_removed} строк")
-    else:
-        print("✅ Пропусков в данных нет")
-    
     # ==================== ШАГ 4: СОЗДАНИЕ ПАПОК ====================
     os.makedirs('plots', exist_ok=True)
     os.makedirs('models', exist_ok=True)
@@ -91,7 +86,6 @@ def main():
         print("\n" + "=" * 80)
         print("🔄 НОРМАЛИЗАЦИЯ ДАННЫХ")
         print("=" * 80)
-        print(f"   Метод: {params['preprocessing']['normalization_method']}")
         
         X_train, X_val, X_test, scaler = normalize_features(
             X_train, X_val, X_test,
@@ -110,7 +104,6 @@ def main():
     
     model_lr = train_linear_regression(X_train, y_train, params['linear_regression'])
     metrics_lr, importance_lr = evaluate_lr(model_lr, X_train, X_val, X_test, y_train, y_val, y_test, features)
-    print_metrics_table(metrics_lr, "Линейная регрессия")
     print_lr_importance(importance_lr, top_n=8)
     save_lr(model_lr, 'models/linear_regression.pkl')
     save_metrics(metrics_lr, 'linear_regression')
@@ -123,7 +116,6 @@ def main():
     
     model_dt = train_decision_tree(X_train, y_train, params['decision_tree'])
     metrics_dt, importance_dt = evaluate_dt(model_dt, X_train, X_val, X_test, y_train, y_val, y_test, features)
-    print_metrics_table(metrics_dt, "Дерево решений")
     print_dt_importance(importance_dt, top_n=8)
     visualize_tree(model_dt, features, max_depth=3, save_path='plots/decision_tree.png')
     save_dt(model_dt, 'models/decision_tree.pkl')
@@ -137,7 +129,6 @@ def main():
     
     model_cb = train_catboost(X_train, y_train, X_val, y_val, params['catboost'], verbose=False)
     metrics_cb, importance_cb = evaluate_cb(model_cb, X_train, X_val, X_test, y_train, y_val, y_test, features)
-    print_metrics_table(metrics_cb, "CatBoost")
     print_cb_importance(importance_cb, top_n=8)
     save_cb(model_cb, 'models/catboost.cbm')
     save_metrics(metrics_cb, 'catboost')
@@ -150,7 +141,6 @@ def main():
     
     model_xgb = train_xgboost(X_train, y_train, X_val, y_val, params['xgboost'], verbose=False)
     metrics_xgb, importance_xgb = evaluate_xgb(model_xgb, X_train, X_val, X_test, y_train, y_val, y_test, features)
-    print_metrics_table(metrics_xgb, "XGBoost")
     print_xgb_importance(importance_xgb, top_n=8)
     save_xgb(model_xgb, 'models/xgboost.json')
     save_metrics(metrics_xgb, 'xgboost')
@@ -164,7 +154,6 @@ def main():
     # Для нейросети передаем оригинальные данные (уже нормализованные)
     model_nn, _ = train_neural_network(X_train, y_train, X_val, y_val, params['neural_network'], verbose=False)
     metrics_nn, importance_nn = evaluate_nn(model_nn, X_train, X_val, X_test, y_train, y_val, y_test, features)
-    print_metrics_table(metrics_nn, "Нейронная сеть")
     print_nn_importance(importance_nn, top_n=8)
     save_nn(model_nn, 'models/neural_network.keras')
     save_metrics(metrics_nn, 'neural_network')

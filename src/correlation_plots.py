@@ -10,10 +10,6 @@ def plot_full_correlation_heatmap(
     save_path: str = 'plots/full_correlation.png',
     figsize: Tuple[int, int] = (20, 16)
 ) -> pd.DataFrame:
-    """
-    Построение полной тепловой карты корреляций для всех числовых признаков
-    """
-    print("\n📊 Построение полной тепловой карты корреляций...")
     
     numeric_df = df.select_dtypes(include=[np.number])
     
@@ -56,6 +52,6 @@ def plot_full_correlation_heatmap(
     
     plt.savefig(save_path, dpi=300, bbox_inches='tight')
     plt.close()
-    print(f"✅ Полная тепловая карта сохранена: {save_path}")
+    print(f"✅ Тепловая карта сохранена: {save_path}")
     
     return correlation_matrix

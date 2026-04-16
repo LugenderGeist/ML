@@ -116,6 +116,3 @@ def print_feature_importance(feature_importance: pd.DataFrame, top_n: int = 8):
     
     for idx, row in top_features.iterrows():
         print(f"   {row['Признак']:35} {row['Важность']:10.4f}")
-    
-    print(f"\n   💡 XGBoost Feature Importance показывает вклад каждого признака")
-    print(f"   (сумма всех важностей = {feature_importance['Важность'].sum():.2f})")
