@@ -4,7 +4,11 @@ general:
   train_size: 0.7
   val_size: 0.2
   test_size: 0.1
-  correlation_threshold: 0.3
+
+# Предобработка данных
+preprocessing:
+  normalize: true
+  normalization_method: minmax  # standard, minmax, robust
 
 # Линейная регрессия
 linear_regression:
@@ -13,9 +17,9 @@ linear_regression:
 
 # Дерево решений
 decision_tree:
-  max_depth: 5
-  min_samples_split: 10
-  min_samples_leaf: 25
+  max_depth: 6
+  min_samples_split: 30
+  min_samples_leaf: 10
   random_state: 42
 
 # CatBoost
@@ -23,18 +27,18 @@ catboost:
   iterations: 1000
   learning_rate: 0.05
   depth: 9
-  l2_leaf_reg: 4.0
+  l2_leaf_reg: 3.0
   random_seed: 42
 
 # XGBoost
 xgboost:
-  n_estimators: 1100
-  learning_rate: 0.05
+  n_estimators: 1000
+  learning_rate: 0.03
   max_depth: 9
   subsample: 0.8
-  colsample_bytree: 0.6
-  reg_alpha: 0.5
-  reg_lambda: 5.0
+  colsample_bytree: 0.8
+  reg_alpha: 0.1
+  reg_lambda: 1.0
   random_state: 42
   early_stopping_rounds: 20
   eval_metric: rmse
@@ -43,7 +47,7 @@ xgboost:
 neural_network:
   epochs: 100
   batch_size: 16
-  learning_rate: 0.005
+  learning_rate: 0.001
   layer_1_neurons: 120
   layer_2_neurons: 60
   layer_3_neurons: 30

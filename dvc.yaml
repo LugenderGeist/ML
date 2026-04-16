@@ -1,54 +1,94 @@
 stages:
-  train_all_models:
-    cmd: python main.py
+  prepare_data:
+    cmd: python prepare_data.py
     deps:
       - data/cancer_reg1.csv
-      - main.py
       - src/correlation_plots.py
-      - src/linear_regression.py
-      - src/decision_tree.py
-      - src/catboost_model.py
-      - src/xgboost_model.py
-      - src/neural_network.py
+      - src/preprocessing.py
       - src/utils.py
       - params.yaml
+    params:
+      - general
+      - preprocessing
     outs:
-      - models
-      - plots
+      - data/prepared_data.pkl
+      - plots/full_correlation.png
+      - models/features.json
+      - models/scaler.pkl
+
+  train_linear_regression:
+    cmd: python train_linear_regression.py
+    deps:
+      - data/prepared_data.pkl
+      - src/linear_regression.py
+      - src/utils.py
+    params:
+      - linear_regression  # только параметры линейной регрессии!
+    outs:
+      - models/linear_regression.pkl
     metrics:
+      - metrics/linear_regression_metrics.json
+
+  train_decision_tree:
+    cmd: python train_decision_tree.py
+    deps:
+      - data/prepared_data.pkl
+      - src/decision_tree.py
+      - src/utils.py
+    params:
+      - decision_tree  # только параметры дерева!
+    outs:
+      - models/decision_tree.pkl
+      - plots/decision_tree.png
+    metrics:
+      - metrics/decision_tree_metrics.json
+
+  train_catboost:
+    cmd: python train_catboost.py
+    deps:
+      - data/prepared_data.pkl
+      - src/catboost_model.py
+      - src/utils.py
+    params:
+      - catboost  # только параметры CatBoost!
+    outs:
+      - models/catboost.cbm
+    metrics:
+      - metrics/catboost_metrics.json
+
+  train_xgboost:
+    cmd: python train_xgboost.py
+    deps:
+      - data/prepared_data.pkl
+      - src/xgboost_model.py
+      - src/utils.py
+    params:
+      - xgboost  # только параметры XGBoost!
+    outs:
+      - models/xgboost.json
+    metrics:
+      - metrics/xgboost_metrics.json
+
+  train_neural_network:
+    cmd: python train_neural_network.py
+    deps:
+      - data/prepared_data.pkl
+      - src/neural_network.py
+      - src/utils.py
+    params:
+      - neural_network  # только параметры нейросети!
+    outs:
+      - models/neural_network.keras
+    metrics:
+      - metrics/neural_network_metrics.json
+
+  compare_models:
+    cmd: python compare_models.py
+    deps:
       - metrics/linear_regression_metrics.json
       - metrics/decision_tree_metrics.json
       - metrics/catboost_metrics.json
       - metrics/xgboost_metrics.json
       - metrics/neural_network_metrics.json
+    outs:
       - metrics/models_comparison.csv
-    params:
-      - general.random_state
-      - general.train_size
-      - general.val_size
-      - general.test_size
-      - general.correlation_threshold
-      - linear_regression.fit_intercept
-      - linear_regression.positive
-      - decision_tree.max_depth
-      - decision_tree.min_samples_split
-      - decision_tree.min_samples_leaf
-      - catboost.iterations
-      - catboost.learning_rate
-      - catboost.depth
-      - catboost.l2_leaf_reg
-      - xgboost.n_estimators
-      - xgboost.learning_rate
-      - xgboost.max_depth
-      - xgboost.subsample
-      - xgboost.colsample_bytree
-      - xgboost.reg_alpha
-      - xgboost.reg_lambda
-      - neural_network.epochs
-      - neural_network.batch_size
-      - neural_network.learning_rate
-      - neural_network.layer_1_neurons
-      - neural_network.layer_2_neurons
-      - neural_network.layer_3_neurons
-      - neural_network.dropout_rate
-      - neural_network.patience

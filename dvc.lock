@@ -1,111 +1,250 @@
 schema: '2.0'
 stages:
-  train_all_models:
-    cmd: python main.py
+  prepare_data:
+    cmd: python prepare_data.py
     deps:
     - path: data/cancer_reg1.csv
       hash: md5
       md5: 424efc6a68b78c8c0cda7ba330d4f223
       size: 406438
-    - path: main.py
-      hash: md5
-      md5: 026d64cd46c65f89fe92e82c2fdba91e
-      size: 10296
     - path: params.yaml
       hash: md5
-      md5: 9d955da0084670d27698244685e5ffee
-      size: 989
-    - path: src/catboost_model.py
-      hash: md5
-      md5: 403cf1e6638f414306044e226132e56a
-      size: 4054
+      md5: 124e5f9dca7d1917fcdd22bb112bb98f
+      size: 1099
     - path: src/correlation_plots.py
       hash: md5
-      md5: b57689a708b43bc5f2ce8858cbad2247
-      size: 7880
-    - path: src/decision_tree.py
+      md5: 75d5e419f81fa8c25ce1d397b0e1f705
+      size: 2593
+    - path: src/preprocessing.py
       hash: md5
-      md5: 3107d2ddb51a54a71d7a5bb7381bd890
-      size: 4424
+      md5: e8746a5cd57000f21b37cd7689541d7b
+      size: 2956
+    - path: src/utils.py
+      hash: md5
+      md5: 19270868df1106e93cb4622938f7f917
+      size: 4244
+    params:
+      params.yaml:
+        general:
+          random_state: 42
+          train_size: 0.7
+          val_size: 0.2
+          test_size: 0.1
+        preprocessing:
+          normalize: true
+          normalization_method: minmax
+    outs:
+    - path: data/prepared_data.pkl
+      hash: md5
+      md5: 6d15312373cb6c3e8575d5531144394e
+      size: 670851
+    - path: models/features.json
+      hash: md5
+      md5: a36931a38e446ff90e33f978fd35a659
+      size: 1036
+    - path: models/scaler.pkl
+      hash: md5
+      md5: fca3e9a7af58cb0765b2d7c11c4b01dc
+      size: 2887
+    - path: plots/full_correlation.png
+      hash: md5
+      md5: 0a20786f9b7ce87f0345f0de0dd18c35
+      size: 1573327
+  train_linear_regression:
+    cmd: python train_linear_regression.py
+    deps:
+    - path: data/prepared_data.pkl
+      hash: md5
+      md5: 6d15312373cb6c3e8575d5531144394e
+      size: 670851
     - path: src/linear_regression.py
       hash: md5
       md5: 3e80dad9c116d83196b3d93438782fbc
       size: 3644
-    - path: src/neural_network.py
-      hash: md5
-      md5: 7254849008b199f9523fcb7ff4e0517b
-      size: 5845
     - path: src/utils.py
       hash: md5
-      md5: 3d89826afddecc97579e7a2366283729
-      size: 4977
+      md5: 19270868df1106e93cb4622938f7f917
+      size: 4244
+    params:
+      params.yaml:
+        linear_regression:
+          fit_intercept: true
+          positive: false
+    outs:
+    - path: metrics/linear_regression_metrics.json
+      hash: md5
+      md5: db3a1931e91893632462383e8b04a366
+      size: 348
+    - path: models/linear_regression.pkl
+      hash: md5
+      md5: 596580265a2f9c54eaa2676d6fe1027d
+      size: 2136
+  train_decision_tree:
+    cmd: python train_decision_tree.py
+    deps:
+    - path: data/prepared_data.pkl
+      hash: md5
+      md5: 6d15312373cb6c3e8575d5531144394e
+      size: 670851
+    - path: src/decision_tree.py
+      hash: md5
+      md5: 3107d2ddb51a54a71d7a5bb7381bd890
+      size: 4424
+    - path: src/utils.py
+      hash: md5
+      md5: 19270868df1106e93cb4622938f7f917
+      size: 4244
+    params:
+      params.yaml:
+        decision_tree:
+          max_depth: 6
+          min_samples_split: 30
+          min_samples_leaf: 10
+          random_state: 42
+    outs:
+    - path: metrics/decision_tree_metrics.json
+      hash: md5
+      md5: 2ec6602d921cfd57e3c819bd75e8363a
+      size: 351
+    - path: models/decision_tree.pkl
+      hash: md5
+      md5: 4910560f6c90e10b3fb21d256a34ba31
+      size: 8129
+    - path: plots/decision_tree.png
+      hash: md5
+      md5: 0c060228f2153cff52f28f32d94564b1
+      size: 936110
+  train_catboost:
+    cmd: python train_catboost.py
+    deps:
+    - path: data/prepared_data.pkl
+      hash: md5
+      md5: 6d15312373cb6c3e8575d5531144394e
+      size: 670851
+    - path: src/catboost_model.py
+      hash: md5
+      md5: 403cf1e6638f414306044e226132e56a
+      size: 4054
+    - path: src/utils.py
+      hash: md5
+      md5: 19270868df1106e93cb4622938f7f917
+      size: 4244
+    params:
+      params.yaml:
+        catboost:
+          iterations: 1000
+          learning_rate: 0.05
+          depth: 9
+          l2_leaf_reg: 3.0
+          random_seed: 42
+    outs:
+    - path: metrics/catboost_metrics.json
+      hash: md5
+      md5: c3cc3abd31d7ac4cbcb37d3a7ac8a45f
+      size: 350
+    - path: models/catboost.cbm
+      hash: md5
+      md5: 18ce1a308b3ccec018a5919f2e3312a0
+      size: 8269168
+  train_xgboost:
+    cmd: python train_xgboost.py
+    deps:
+    - path: data/prepared_data.pkl
+      hash: md5
+      md5: 6d15312373cb6c3e8575d5531144394e
+      size: 670851
+    - path: src/utils.py
+      hash: md5
+      md5: 19270868df1106e93cb4622938f7f917
+      size: 4244
     - path: src/xgboost_model.py
       hash: md5
       md5: 9a0364d759dba8acc293165c5dd61a24
       size: 4195
     params:
       params.yaml:
-        catboost.depth: 9
-        catboost.iterations: 1000
-        catboost.l2_leaf_reg: 4.0
-        catboost.learning_rate: 0.05
-        decision_tree.max_depth: 5
-        decision_tree.min_samples_leaf: 25
-        decision_tree.min_samples_split: 10
-        general.correlation_threshold: 0.3
-        general.random_state: 42
-        general.test_size: 0.1
-        general.train_size: 0.7
-        general.val_size: 0.2
-        linear_regression.fit_intercept: true
-        linear_regression.positive: false
-        neural_network.batch_size: 16
-        neural_network.dropout_rate: 0.1
-        neural_network.epochs: 100
-        neural_network.layer_1_neurons: 120
-        neural_network.layer_2_neurons: 60
-        neural_network.layer_3_neurons: 20
-        neural_network.learning_rate: 0.005
-        neural_network.patience: 20
-        xgboost.colsample_bytree: 0.6
-        xgboost.learning_rate: 0.05
-        xgboost.max_depth: 9
-        xgboost.n_estimators: 1100
-        xgboost.reg_alpha: 0.5
-        xgboost.reg_lambda: 5.0
-        xgboost.subsample: 0.8
+        xgboost:
+          n_estimators: 1000
+          learning_rate: 0.03
+          max_depth: 9
+          subsample: 0.8
+          colsample_bytree: 0.8
+          reg_alpha: 0.1
+          reg_lambda: 1.0
+          random_state: 42
+          early_stopping_rounds: 20
+          eval_metric: rmse
     outs:
-    - path: metrics/catboost_metrics.json
-      hash: md5
-      md5: 4e369724e5851f7660286cb514bf3c91
-      size: 351
-    - path: metrics/decision_tree_metrics.json
-      hash: md5
-      md5: 265a9e64b76f364c0d7a6a632f98c2b9
-      size: 349
-    - path: metrics/linear_regression_metrics.json
-      hash: md5
-      md5: a22b8122b4e4e192819e71bb7f795f75
-      size: 348
-    - path: metrics/models_comparison.csv
-      hash: md5
-      md5: f3bcaab416ecaa3ad9721cef7774964c
-      size: 551
-    - path: metrics/neural_network_metrics.json
-      hash: md5
-      md5: 216f2b867f1b0f821021012849a78229
-      size: 349
     - path: metrics/xgboost_metrics.json
       hash: md5
-      md5: 68f113dd33a6d45a4c5294bcbcebd6aa
+      md5: bd7abfa4631a318d706274e2a2345c74
+      size: 352
+    - path: models/xgboost.json
+      hash: md5
+      md5: 74a3e995665b75ba643892c112de8387
+      size: 11914051
+  train_neural_network:
+    cmd: python train_neural_network.py
+    deps:
+    - path: data/prepared_data.pkl
+      hash: md5
+      md5: 6d15312373cb6c3e8575d5531144394e
+      size: 670851
+    - path: src/neural_network.py
+      hash: md5
+      md5: 0cb281bad2d6b84331bfa14b01604e62
+      size: 7893
+    - path: src/utils.py
+      hash: md5
+      md5: 19270868df1106e93cb4622938f7f917
+      size: 4244
+    params:
+      params.yaml:
+        neural_network:
+          epochs: 100
+          batch_size: 16
+          learning_rate: 0.001
+          layer_1_neurons: 120
+          layer_2_neurons: 60
+          layer_3_neurons: 30
+          activation: relu
+          dropout_rate: 0.1
+          patience: 20
+          random_state: 42
+    outs:
+    - path: metrics/neural_network_metrics.json
+      hash: md5
+      md5: 4fa2d1add3beb72d2459702065d4d15b
       size: 351
-    - path: models
+    - path: models/neural_network.keras
       hash: md5
-      md5: 41dc9f699e474b76e6aea6a100f643b3.dir
-      size: 4454916
-      nfiles: 7
-    - path: plots
+      md5: 0a12f4313a7519f0311293cba3355ccb
+      size: 183732
+  compare_models:
+    cmd: python compare_models.py
+    deps:
+    - path: metrics/catboost_metrics.json
       hash: md5
-      md5: f8d754f9abe0094b9f2410c0d37c2199.dir
-      size: 2082837
-      nfiles: 3
+      md5: c3cc3abd31d7ac4cbcb37d3a7ac8a45f
+      size: 350
+    - path: metrics/decision_tree_metrics.json
+      hash: md5
+      md5: 2ec6602d921cfd57e3c819bd75e8363a
+      size: 351
+    - path: metrics/linear_regression_metrics.json
+      hash: md5
+      md5: db3a1931e91893632462383e8b04a366
+      size: 348
+    - path: metrics/neural_network_metrics.json
+      hash: md5
+      md5: 4fa2d1add3beb72d2459702065d4d15b
+      size: 351
+    - path: metrics/xgboost_metrics.json
+      hash: md5
+      md5: bd7abfa4631a318d706274e2a2345c74
+      size: 352
+    outs:
+    - path: metrics/models_comparison.csv
+      hash: md5
+      md5: 66470cfbc35abf03936b637b1793bbac
+      size: 550

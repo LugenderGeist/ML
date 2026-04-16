@@ -9,21 +9,20 @@ import json
 import warnings
 warnings.filterwarnings('ignore')
 
-from src.correlation_plots import plot_full_correlation_heatmap, plot_high_correlation_heatmap
+from src.correlation_plots import plot_full_correlation_heatmap
 from src.linear_regression import train_linear_regression, evaluate_model as evaluate_lr, save_model as save_lr, print_feature_importance as print_lr_importance
 from src.decision_tree import train_decision_tree, evaluate_model as evaluate_dt, save_model as save_dt, visualize_tree, print_feature_importance as print_dt_importance
 from src.catboost_model import train_catboost, evaluate_model as evaluate_cb, save_model as save_cb, print_feature_importance as print_cb_importance
 from src.xgboost_model import train_xgboost, evaluate_model as evaluate_xgb, save_model as save_xgb, print_feature_importance as print_xgb_importance
 from src.neural_network import train_neural_network, evaluate_model as evaluate_nn, save_model as save_nn, print_feature_importance as print_nn_importance
-from src.utils import save_metrics, print_metrics_table, select_features_for_training, prepare_data_for_training
-
+from src.preprocessing import normalize_features, save_scaler, add_normalization_params
+from src.utils import save_metrics, print_metrics_table, select_all_features, prepare_data_for_training
 
 def load_params(config_path='params.yaml'):
     import yaml
     with open(config_path, 'r') as f:
         params = yaml.safe_load(f)
-    return params
-
+    return add_normalization_params(params)
 
 def main():
     print("=" * 80)
@@ -34,13 +33,14 @@ def main():
     try:
         params = load_params()
     except FileNotFoundError:
-        print("⚠️ Файл config/params.yaml не найден, использую параметры по умолчанию")
+        print("⚠️ Файл params.yaml не найден, использую параметры по умолчанию")
         params = {
             'general': {'random_state': 42, 'train_size': 0.7, 'val_size': 0.2, 'test_size': 0.1, 'correlation_threshold': 0.3},
+            'preprocessing': {'normalize': True, 'normalization_method': 'standard'},
             'linear_regression': {'fit_intercept': True, 'positive': False},
-            'decision_tree': {'max_depth': 5, 'min_samples_split': 20, 'min_samples_leaf': 10, 'random_state': 42},
-            'catboost': {'iterations': 500, 'learning_rate': 0.03, 'depth': 6, 'l2_leaf_reg': 3.0, 'random_seed': 42},
-            'xgboost': {'n_estimators': 500, 'learning_rate': 0.03, 'max_depth': 6, 'subsample': 0.8, 
+            'decision_tree': {'max_depth': 8, 'min_samples_split': 20, 'min_samples_leaf': 10, 'random_state': 42},
+            'catboost': {'iterations': 800, 'learning_rate': 0.03, 'depth': 9, 'l2_leaf_reg': 3.0, 'random_seed': 42},
+            'xgboost': {'n_estimators': 500, 'learning_rate': 0.03, 'max_depth': 9, 'subsample': 0.8, 
                        'colsample_bytree': 0.8, 'reg_alpha': 0.1, 'reg_lambda': 1.0, 'random_state': 42,
                        'early_stopping_rounds': 20, 'eval_metric': 'rmse'},
             'neural_network': {'epochs': 100, 'batch_size': 32, 'learning_rate': 0.001, 
@@ -51,7 +51,6 @@ def main():
     # ==================== ШАГ 2: ЗАГРУЗКА ДАННЫХ ====================
     file_path = 'data/cancer_reg1.csv'
     df = pd.read_csv(file_path)
-    print(f"\n✅ Данные загружены: {df.shape[0]} строк, {df.shape[1]} столбцов")
     
     # ==================== ШАГ 3: УДАЛЕНИЕ ПРОПУСКОВ ====================
     initial_rows = len(df)
@@ -68,26 +67,15 @@ def main():
     os.makedirs('models', exist_ok=True)
     os.makedirs('metrics', exist_ok=True)
     
-    # ==================== ШАГ 5: ТЕПЛОВЫЕ КАРТЫ ====================
+    # ==================== ШАГ 5: ТЕПЛОВАЯ КАРТА ====================
     plot_full_correlation_heatmap(df, save_path='plots/full_correlation.png')
-    plot_high_correlation_heatmap(
-        df,
-        threshold=params['general']['correlation_threshold'],
-        save_path='plots/high_correlation.png'
-    )
-    
-    # ==================== ШАГ 6: ОТБОР ПРИЗНАКОВ ====================
-    features, _ = select_features_for_training(
-        df, 
-        correlation_threshold=params['general']['correlation_threshold']
-    )
-    
+
+    # ==================== ШАГ 6: ВЫБОР ВСЕХ ПРИЗНАКОВ ====================
+    features = select_all_features(df, target='Смерти/д.н.')
+
     if features is None or len(features) == 0:
         print("❌ Нет признаков для обучения!")
         return
-    
-    with open('models/features.json', 'w', encoding='utf-8') as f:
-        json.dump(features, f, indent=2, ensure_ascii=False)
     
     # ==================== ШАГ 7: ПОДГОТОВКА ДАННЫХ (70/20/10) ====================
     X_train, X_val, X_test, y_train, y_val, y_test = prepare_data_for_training(
@@ -98,9 +86,24 @@ def main():
         random_state=params['general']['random_state']
     )
     
-    # ==================== ШАГ 8: ОБУЧЕНИЕ МОДЕЛЕЙ ====================
+    # ==================== ШАГ 8: НОРМАЛИЗАЦИЯ ДАННЫХ ====================
+    if params['preprocessing']['normalize']:
+        print("\n" + "=" * 80)
+        print("🔄 НОРМАЛИЗАЦИЯ ДАННЫХ")
+        print("=" * 80)
+        print(f"   Метод: {params['preprocessing']['normalization_method']}")
+        
+        X_train, X_val, X_test, scaler = normalize_features(
+            X_train, X_val, X_test,
+            method=params['preprocessing']['normalization_method']
+        )
+        save_scaler(scaler, 'models/scaler.pkl')
+    else:
+        print("\n⚠️ Нормализация отключена")
     
-    # 8.1 ЛИНЕЙНАЯ РЕГРЕССИЯ
+    # ==================== ШАГ 9: ОБУЧЕНИЕ МОДЕЛЕЙ ====================
+    
+    # 9.1 ЛИНЕЙНАЯ РЕГРЕССИЯ
     print("\n" + "=" * 80)
     print("📈 ЛИНЕЙНАЯ РЕГРЕССИЯ")
     print("=" * 80)
@@ -113,7 +116,7 @@ def main():
     save_metrics(metrics_lr, 'linear_regression')
     importance_lr.to_csv('metrics/linear_regression_features.csv', index=False)
     
-    # 8.2 ДЕРЕВО РЕШЕНИЙ
+    # 9.2 ДЕРЕВО РЕШЕНИЙ 
     print("\n" + "=" * 80)
     print("🌳 ДЕРЕВО РЕШЕНИЙ")
     print("=" * 80)
@@ -127,7 +130,7 @@ def main():
     save_metrics(metrics_dt, 'decision_tree')
     importance_dt.to_csv('metrics/decision_tree_features.csv', index=False)
     
-    # 8.3 CATBOOST
+    # 9.3 CATBOOST
     print("\n" + "=" * 80)
     print("🐱 CATBOOST")
     print("=" * 80)
@@ -140,7 +143,7 @@ def main():
     save_metrics(metrics_cb, 'catboost')
     importance_cb.to_csv('metrics/catboost_features.csv', index=False)
     
-    # 8.4 XGBOOST
+    # 9.4 XGBOOST
     print("\n" + "=" * 80)
     print("⚡ XGBOOST")
     print("=" * 80)
@@ -153,19 +156,20 @@ def main():
     save_metrics(metrics_xgb, 'xgboost')
     importance_xgb.to_csv('metrics/xgboost_features.csv', index=False)
     
-    # 8.5 НЕЙРОННАЯ СЕТЬ
+    # 9.5 НЕЙРОННАЯ СЕТЬ
     print("\n" + "=" * 80)
-    print("🧠 НЕЙРОННАЯ СЕТЬ (TensorFlow)")
+    print("🧠 НЕЙРОННАЯ СЕТЬ")
     print("=" * 80)
     
-    model_nn, scaler_nn = train_neural_network(X_train, y_train, X_val, y_val, params['neural_network'], verbose=False)
-    metrics_nn, importance_nn = evaluate_nn(model_nn, scaler_nn, X_train, X_val, X_test, y_train, y_val, y_test, features)
+    # Для нейросети передаем оригинальные данные (уже нормализованные)
+    model_nn, _ = train_neural_network(X_train, y_train, X_val, y_val, params['neural_network'], verbose=False)
+    metrics_nn, importance_nn = evaluate_nn(model_nn, X_train, X_val, X_test, y_train, y_val, y_test, features)
     print_metrics_table(metrics_nn, "Нейронная сеть")
     print_nn_importance(importance_nn, top_n=8)
-    save_nn(model_nn, scaler_nn, 'models/neural_network.keras')
+    save_nn(model_nn, 'models/neural_network.keras')
     save_metrics(metrics_nn, 'neural_network')
     
-    # ==================== ШАГ 9: СРАВНЕНИЕ МОДЕЛЕЙ ====================
+    # ==================== ШАГ 10: СРАВНЕНИЕ МОДЕЛЕЙ ====================
     print("\n" + "=" * 80)
     print("🏆 СРАВНЕНИЕ МОДЕЛЕЙ")
     print("=" * 80)
@@ -178,13 +182,6 @@ def main():
             metrics_cb['test']['R2'],
             metrics_xgb['test']['R2'],
             metrics_nn['test']['R2']
-        ],
-        'R² (val)': [
-            metrics_lr['validation']['R2'], 
-            metrics_dt['validation']['R2'],
-            metrics_cb['validation']['R2'],
-            metrics_xgb['validation']['R2'],
-            metrics_nn['validation']['R2']
         ],
         'RMSE (test)': [
             metrics_lr['test']['RMSE'], 
@@ -210,11 +207,6 @@ def main():
     print("\n" + "=" * 80)
     print("✅ ГОТОВО!")
     print("=" * 80)
-    
-    best_model = comparison.iloc[0]['Модель']
-    best_r2 = comparison.iloc[0]['R² (test)']
-    print(f"\n🥇 Лучшая модель: {best_model} (R² = {best_r2:.4f})")
-
 
 if __name__ == "__main__":
     main()

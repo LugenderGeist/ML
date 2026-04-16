@@ -43,27 +43,27 @@ def print_metrics_table(metrics: dict, model_name: str):
         print(f"    MAE: {metrics['validation']['MAE']:.4f}")
 
 
-def select_features_for_training(
+def select_all_features(
     df: pd.DataFrame, 
-    target: str = 'Смерти/д.н.', 
-    correlation_threshold: float = 0.3
-) -> Tuple[List[str], pd.Series]:
-    """Отбор признаков для обучения на основе корреляции с целевой переменной"""
+    target: str = 'Смерти/д.н.'
+) -> List[str]:
+    """
+    Используем ВСЕ числовые признаки (без автоматического отбора)
+    Ты сама решишь, какие удалить, посмотрев на тепловую карту!
+    """
     numeric_df = df.select_dtypes(include=[np.number])
     
     if target not in numeric_df.columns:
         print(f"❌ Целевая переменная '{target}' не найдена!")
-        return None, None
+        return None
     
-    correlations = numeric_df.corr()[target].abs().sort_values(ascending=False)
-    selected_features = correlations[correlations > correlation_threshold].index.tolist()
+    # Берем все числовые признаки, кроме целевой переменной
+    selected_features = [col for col in numeric_df.columns if col != target]
     
-    if target in selected_features:
-        selected_features.remove(target)
+    print(f"\n🎯 Используем ВСЕ числовые признаки: {len(selected_features)}")
+    print(f"   (Ты можешь удалить ненужные вручную после просмотра тепловой карты)")
     
-    print(f"🎯 Отобрано {len(selected_features)} признаков с корреляцией > {correlation_threshold*100:.0f}%")
-    
-    return selected_features, correlations
+    return selected_features
 
 
 def prepare_data_for_training(
@@ -77,27 +77,6 @@ def prepare_data_for_training(
 ):
     """
     Подготовка данных для обучения с разделением на train/validation/test
-    
-    Parameters:
-    -----------
-    df : pd.DataFrame
-        Исходные данные
-    features : List[str]
-        Список признаков
-    target : str
-        Название целевой переменной
-    train_size : float
-        Доля обучающей выборки (по умолчанию 70%)
-    val_size : float
-        Доля валидационной выборки (по умолчанию 20%)
-    test_size : float
-        Доля тестовой выборки (по умолчанию 10%)
-    random_state : int
-        Seed для воспроизводимости
-    
-    Returns:
-    --------
-    X_train, X_val, X_test, y_train, y_val, y_test
     """
     X = df[features]
     y = df[target]
@@ -107,7 +86,7 @@ def prepare_data_for_training(
         X, y, test_size=test_size, random_state=random_state
     )
     
-    # Затем из оставшихся 90% отделяем валидацию (20% от исходных = 20/90 ≈ 22% от временной выборки)
+    # Затем из оставшихся 90% отделяем валидацию (20% от исходных)
     val_relative_size = val_size / (train_size + val_size)
     X_train, X_val, y_train, y_val = train_test_split(
         X_temp, y_temp, test_size=val_relative_size, random_state=random_state
