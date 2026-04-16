@@ -37,9 +37,9 @@ xgboost:
   reg_lambda: 1.0
   random_state: 42
   early_stopping_rounds: 20
-  eval_metric: 'rmse'
+  eval_metric: rmse
 
-# Нейронная сеть (TensorFlow)
+# Нейронная сеть
 neural_network:
   epochs: 100
   batch_size: 32
@@ -47,7 +47,7 @@ neural_network:
   layer_1_neurons: 64
   layer_2_neurons: 32
   layer_3_neurons: 16
-  activation: 'relu'
+  activation: relu
   dropout_rate: 0.2
   patience: 20
   random_state: 42
