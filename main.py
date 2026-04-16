@@ -15,7 +15,6 @@ from src.utils import save_metrics, print_metrics_table, select_features_for_tra
 
 
 def load_params(config_path='config/params.yaml'):
-    """Загрузка гиперпараметров из YAML файла"""
     import yaml
     with open(config_path, 'r') as f:
         params = yaml.safe_load(f)
@@ -23,7 +22,6 @@ def load_params(config_path='config/params.yaml'):
 
 
 def main():
-    """Основная функция - анализ данных и обучение моделей"""
     print("=" * 80)
     print("🏥 АНАЛИЗ ДАННЫХ И ОБУЧЕНИЕ МОДЕЛЕЙ")
     print("=" * 80)
@@ -34,16 +32,16 @@ def main():
     except FileNotFoundError:
         print("⚠️ Файл config/params.yaml не найден, использую параметры по умолчанию")
         params = {
-            'general': {'random_state': 42, 'test_size': 0.2, 'correlation_threshold': 0.3},
+            'general': {'random_state': 42, 'train_size': 0.7, 'val_size': 0.2, 'test_size': 0.1, 'correlation_threshold': 0.3},
             'linear_regression': {'fit_intercept': True, 'positive': False},
             'decision_tree': {'max_depth': 5, 'min_samples_split': 20, 'min_samples_leaf': 10, 'random_state': 42},
             'catboost': {'iterations': 500, 'learning_rate': 0.03, 'depth': 6, 'l2_leaf_reg': 3.0, 'random_seed': 42},
             'xgboost': {'n_estimators': 500, 'learning_rate': 0.03, 'max_depth': 6, 'subsample': 0.8, 
-                       'colsample_bytree': 0.8, 'reg_alpha': 0.1, 'reg_lambda': 1.0, 'random_state': 42},
-            'neural_network': {'hidden_layer_sizes': [64, 32, 16], 'activation': 'relu', 'solver': 'adam',
-                              'alpha': 0.0001, 'batch_size': 32, 'learning_rate_init': 0.001,
-                              'max_iter': 500, 'early_stopping': True, 'validation_fraction': 0.1,
-                              'n_iter_no_change': 20, 'random_state': 42}
+                       'colsample_bytree': 0.8, 'reg_alpha': 0.1, 'reg_lambda': 1.0, 'random_state': 42,
+                       'early_stopping_rounds': 20, 'eval_metric': 'rmse'},
+            'neural_network': {'epochs': 100, 'batch_size': 32, 'learning_rate': 0.001, 
+                              'layer_1_neurons': 64, 'layer_2_neurons': 32, 'layer_3_neurons': 16,
+                              'activation': 'relu', 'dropout_rate': 0.2, 'patience': 20, 'random_state': 42}
         }
     
     # ==================== ШАГ 2: ЗАГРУЗКА ДАННЫХ ====================
@@ -67,8 +65,8 @@ def main():
     os.makedirs('metrics', exist_ok=True)
     
     # ==================== ШАГ 5: ТЕПЛОВЫЕ КАРТЫ ====================
-    correlation_matrix = plot_full_correlation_heatmap(df, save_path='plots/full_correlation.png')
-    high_corr_features = plot_high_correlation_heatmap(
+    plot_full_correlation_heatmap(df, save_path='plots/full_correlation.png')
+    plot_high_correlation_heatmap(
         df,
         threshold=params['general']['correlation_threshold'],
         save_path='plots/high_correlation.png'
@@ -84,19 +82,19 @@ def main():
         print("❌ Нет признаков для обучения!")
         return
     
-    # Сохраняем список признаков
     with open('models/features.json', 'w', encoding='utf-8') as f:
         json.dump(features, f, indent=2, ensure_ascii=False)
     
-    # ==================== ШАГ 7: ПОДГОТОВКА ДАННЫХ ====================
-    X_train, X_test, y_train, y_test = prepare_data_for_training(
+    # ==================== ШАГ 7: ПОДГОТОВКА ДАННЫХ (70/20/10) ====================
+    X_train, X_val, X_test, y_train, y_val, y_test = prepare_data_for_training(
         df, features,
+        train_size=params['general']['train_size'],
+        val_size=params['general']['val_size'],
         test_size=params['general']['test_size'],
         random_state=params['general']['random_state']
     )
     
     # ==================== ШАГ 8: ОБУЧЕНИЕ МОДЕЛЕЙ ====================
-    all_metrics = {}
     
     # 8.1 ЛИНЕЙНАЯ РЕГРЕССИЯ
     print("\n" + "=" * 80)
@@ -104,13 +102,12 @@ def main():
     print("=" * 80)
     
     model_lr = train_linear_regression(X_train, y_train, params['linear_regression'])
-    metrics_lr, importance_lr = evaluate_lr(model_lr, X_train, X_test, y_train, y_test, features)
+    metrics_lr, importance_lr = evaluate_lr(model_lr, X_train, X_val, X_test, y_train, y_val, y_test, features)
     print_metrics_table(metrics_lr, "Линейная регрессия")
     print_lr_importance(importance_lr, top_n=8)
     save_lr(model_lr, 'models/linear_regression.pkl')
     save_metrics(metrics_lr, 'linear_regression')
     importance_lr.to_csv('metrics/linear_regression_features.csv', index=False)
-    all_metrics['linear_regression'] = metrics_lr
     
     # 8.2 ДЕРЕВО РЕШЕНИЙ
     print("\n" + "=" * 80)
@@ -118,55 +115,51 @@ def main():
     print("=" * 80)
     
     model_dt = train_decision_tree(X_train, y_train, params['decision_tree'])
-    metrics_dt, importance_dt = evaluate_dt(model_dt, X_train, X_test, y_train, y_test, features)
+    metrics_dt, importance_dt = evaluate_dt(model_dt, X_train, X_val, X_test, y_train, y_val, y_test, features)
     print_metrics_table(metrics_dt, "Дерево решений")
     print_dt_importance(importance_dt, top_n=8)
     visualize_tree(model_dt, features, max_depth=3, save_path='plots/decision_tree.png')
     save_dt(model_dt, 'models/decision_tree.pkl')
     save_metrics(metrics_dt, 'decision_tree')
     importance_dt.to_csv('metrics/decision_tree_features.csv', index=False)
-    all_metrics['decision_tree'] = metrics_dt
     
     # 8.3 CATBOOST
     print("\n" + "=" * 80)
     print("🐱 CATBOOST")
     print("=" * 80)
     
-    model_cb = train_catboost(X_train, y_train, params['catboost'], verbose=False)
-    metrics_cb, importance_cb = evaluate_cb(model_cb, X_train, X_test, y_train, y_test, features)
+    model_cb = train_catboost(X_train, y_train, X_val, y_val, params['catboost'], verbose=False)
+    metrics_cb, importance_cb = evaluate_cb(model_cb, X_train, X_val, X_test, y_train, y_val, y_test, features)
     print_metrics_table(metrics_cb, "CatBoost")
     print_cb_importance(importance_cb, top_n=8)
     save_cb(model_cb, 'models/catboost.cbm')
     save_metrics(metrics_cb, 'catboost')
     importance_cb.to_csv('metrics/catboost_features.csv', index=False)
-    all_metrics['catboost'] = metrics_cb
     
     # 8.4 XGBOOST
     print("\n" + "=" * 80)
     print("⚡ XGBOOST")
     print("=" * 80)
     
-    model_xgb = train_xgboost(X_train, y_train, params['xgboost'], verbose=False)
-    metrics_xgb, importance_xgb = evaluate_xgb(model_xgb, X_train, X_test, y_train, y_test, features)
+    model_xgb = train_xgboost(X_train, y_train, X_val, y_val, params['xgboost'], verbose=False)
+    metrics_xgb, importance_xgb = evaluate_xgb(model_xgb, X_train, X_val, X_test, y_train, y_val, y_test, features)
     print_metrics_table(metrics_xgb, "XGBoost")
     print_xgb_importance(importance_xgb, top_n=8)
     save_xgb(model_xgb, 'models/xgboost.json')
     save_metrics(metrics_xgb, 'xgboost')
     importance_xgb.to_csv('metrics/xgboost_features.csv', index=False)
-    all_metrics['xgboost'] = metrics_xgb
     
-    # 8.5 НЕЙРОННАЯ СЕТЬ (sklearn)
+    # 8.5 НЕЙРОННАЯ СЕТЬ
     print("\n" + "=" * 80)
-    print("🧠 НЕЙРОННАЯ СЕТЬ (MLP)")
+    print("🧠 НЕЙРОННАЯ СЕТЬ (TensorFlow)")
     print("=" * 80)
     
-    model_nn, scaler_nn = train_neural_network(X_train, y_train, params['neural_network'], verbose=False)
-    metrics_nn, importance_nn = evaluate_nn(model_nn, scaler_nn, X_train, X_test, y_train, y_test, features)
+    model_nn, scaler_nn = train_neural_network(X_train, y_train, X_val, y_val, params['neural_network'], verbose=False)
+    metrics_nn, importance_nn = evaluate_nn(model_nn, scaler_nn, X_train, X_val, X_test, y_train, y_val, y_test, features)
     print_metrics_table(metrics_nn, "Нейронная сеть")
     print_nn_importance(importance_nn, top_n=8)
-    save_nn(model_nn, scaler_nn, 'models/neural_network.pkl')
+    save_nn(model_nn, scaler_nn, 'models/neural_network.keras')
     save_metrics(metrics_nn, 'neural_network')
-    all_metrics['neural_network'] = metrics_nn
     
     # ==================== ШАГ 9: СРАВНЕНИЕ МОДЕЛЕЙ ====================
     print("\n" + "=" * 80)
@@ -181,6 +174,13 @@ def main():
             metrics_cb['test']['R2'],
             metrics_xgb['test']['R2'],
             metrics_nn['test']['R2']
+        ],
+        'R² (val)': [
+            metrics_lr['validation']['R2'], 
+            metrics_dt['validation']['R2'],
+            metrics_cb['validation']['R2'],
+            metrics_xgb['validation']['R2'],
+            metrics_nn['validation']['R2']
         ],
         'RMSE (test)': [
             metrics_lr['test']['RMSE'], 
