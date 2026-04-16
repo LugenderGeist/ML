@@ -1,10 +1,8 @@
 import pandas as pd
 import numpy as np
-import os
 from catboost import CatBoostRegressor
 from sklearn.metrics import r2_score, mean_squared_error, mean_absolute_error
 from typing import Tuple, Dict, Any
-
 
 def train_catboost(
     X_train: pd.DataFrame,
