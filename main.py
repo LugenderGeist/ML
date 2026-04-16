@@ -18,7 +18,7 @@ from src.neural_network import train_neural_network, evaluate_model as evaluate_
 from src.utils import save_metrics, print_metrics_table, select_features_for_training, prepare_data_for_training
 
 
-def load_params(config_path='config/params.yaml'):
+def load_params(config_path='params.yaml'):
     import yaml
     with open(config_path, 'r') as f:
         params = yaml.safe_load(f)

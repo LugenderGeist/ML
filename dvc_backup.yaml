@@ -11,7 +11,7 @@ stages:
       - src/xgboost_model.py
       - src/neural_network.py
       - src/utils.py
-      - params.yaml
+      - config/params.yaml
     outs:
       - models
       - plots
