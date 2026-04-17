@@ -13,27 +13,10 @@ def load_params(config_path='params.yaml'):
         params = yaml.safe_load(f)
     return params
 
-def load_optuna_params(model_name):
-    """Загрузка лучших параметров из Optuna (если есть)"""
-    optuna_file = f'metrics/optuna_best_{model_name}.json'
-    if os.path.exists(optuna_file):
-        with open(optuna_file, 'r') as f:
-            return json.load(f)
-    return None
-
 def main():
     
     # Загрузка параметров
     params = load_params()
-
-    # Проверяем, есть ли оптимизированные параметры
-    optuna_params = load_optuna_params('linear_regression')
-    if optuna_params:
-        print("💡 Используются оптимизированные параметры из Optuna")
-        for key, value in optuna_params.items():
-            if key in params['linear_regression']:
-                params['linear_regression'][key] = value
-                print(f"   {key}: {value}")
     
     # Загрузка подготовленных данных
     prepared_data = joblib.load('data/prepared_data.pkl')

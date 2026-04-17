@@ -1,22 +1,25 @@
-catboost:
-  depth: 4
-  iterations: 1000
-  l2_leaf_reg: 9.82
-  learning_rate: 0.272
-  random_seed: 42
-decision_tree:
-  max_depth: 4
-  min_samples_leaf: 10
-  min_samples_split: 50
-  random_state: 42
 general:
   random_state: 42
   test_size: 0.1
   train_size: 0.7
   val_size: 0.2
+preprocessing:
+  normalization_method: minmax
+  normalize: true
 linear_regression:
   fit_intercept: true
   positive: false
+catboost:
+  depth: 6
+  iterations: 1000
+  l2_leaf_reg: 9.82
+  learning_rate: 0.272
+  random_seed: 42
+decision_tree:
+  max_depth: 6
+  min_samples_leaf: 10
+  min_samples_split: 50
+  random_state: 42
 neural_network:
   activation: relu
   batch_size: 16
@@ -28,17 +31,14 @@ neural_network:
   learning_rate: 0.005
   patience: 21
   random_state: 42
-preprocessing:
-  normalization_method: minmax
-  normalize: true
 xgboost:
   colsample_bytree: 0.994
   early_stopping_rounds: 20
   eval_metric: rmse
   learning_rate: 0.0872
-  max_depth: 4
+  max_depth: 6
   n_estimators: 2000
   random_state: 42
-  reg_alpha: 0.808
-  reg_lambda: 1.534
+  reg_alpha: 0.8
+  reg_lambda: 2
   subsample: 0.897
