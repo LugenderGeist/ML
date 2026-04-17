@@ -4,7 +4,6 @@ import json
 import os
 
 def save_metrics(metrics: dict, model_name: str, save_path: str = 'metrics/'):
-    """Сохранение метрик модели в JSON файл"""
     os.makedirs(save_path, exist_ok=True)
     
     def convert_to_serializable(obj):
@@ -26,7 +25,6 @@ def save_metrics(metrics: dict, model_name: str, save_path: str = 'metrics/'):
 
 
 def print_metrics_table(metrics: dict, model_name: str):
-    """Краткий вывод метрик"""
     print(f"\n{model_name}:")
     print(f"  R² на тесте: {metrics['test']['R2']:.4f}")
     print(f"  RMSE на тесте: {metrics['test']['RMSE']:.4f}")

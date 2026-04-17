@@ -13,7 +13,6 @@ def train_decision_tree(
     y_train: pd.Series,
     params: Dict[str, Any]
 ) -> DecisionTreeRegressor:
-    """Обучение модели дерева решений"""
     print("\n🌳 Обучение дерева решений...")
     
     model = DecisionTreeRegressor(
@@ -40,9 +39,7 @@ def evaluate_model(
     y_test: pd.Series,
     feature_names: list
 ) -> Tuple[Dict[str, Dict[str, float]], pd.DataFrame]:
-    """
-    Оценка качества модели на train, validation и test
-    """
+
     # Предсказания
     y_train_pred = model.predict(X_train)
     y_val_pred = model.predict(X_val)
@@ -86,10 +83,8 @@ def evaluate_model(
 
 
 def save_model(model: DecisionTreeRegressor, save_path: str = 'models/decision_tree.pkl'):
-    """Сохранение модели в файл"""
     os.makedirs(os.path.dirname(save_path), exist_ok=True)
     joblib.dump(model, save_path)
-    print(f"💾 Модель сохранена: {save_path}")
 
 
 def visualize_tree(
@@ -98,7 +93,6 @@ def visualize_tree(
     max_depth: int = 3,
     save_path: str = 'plots/decision_tree.png'
 ):
-    """Визуализация дерева решений"""
     plt.figure(figsize=(20, 12))
     
     plot_tree(
@@ -117,7 +111,6 @@ def visualize_tree(
 
 
 def print_feature_importance(feature_importance: pd.DataFrame, top_n: int = 8):
-    """Вывод топ-N наиболее важных признаков"""
     print("\n📊 Топ важности признаков (Feature Importance):")
     print("-" * 55)
     
@@ -125,6 +118,3 @@ def print_feature_importance(feature_importance: pd.DataFrame, top_n: int = 8):
     
     for idx, row in top_features.iterrows():
         print(f"   {row['Признак']:35} {row['Важность']:10.4f}")
-    
-    print(f"\n   💡 Feature Importance показывает вклад признака в уменьшение неопределенности")
-    print(f"   (сумма всех важностей = {feature_importance['Важность'].sum():.2f})")

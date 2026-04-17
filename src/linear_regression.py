@@ -12,7 +12,6 @@ def train_linear_regression(
     y_train: pd.Series,
     params: Dict[str, Any]
 ) -> LinearRegression:
-    """Обучение модели линейной регрессии"""
     print("\n📈 Обучение линейной регрессии...")
     
     model = LinearRegression(
@@ -37,9 +36,7 @@ def evaluate_model(
     y_test: pd.Series,
     feature_names: list
 ) -> Tuple[Dict[str, Dict[str, float]], pd.DataFrame]:
-    """
-    Оценка качества модели на train, validation и test
-    """
+
     # Предсказания
     y_train_pred = model.predict(X_train)
     y_val_pred = model.predict(X_val)
@@ -86,11 +83,9 @@ def save_model(model: LinearRegression, save_path: str = 'models/linear_regressi
     """Сохранение модели в файл"""
     os.makedirs(os.path.dirname(save_path), exist_ok=True)
     joblib.dump(model, save_path)
-    print(f"💾 Модель сохранена: {save_path}")
 
 
 def print_feature_importance(feature_importance: pd.DataFrame, top_n: int = 8):
-    """Вывод топ-N наиболее важных признаков"""
     print("\n📊 Топ важности признаков (Коэффициенты):")
     print("-" * 55)
     
@@ -98,6 +93,5 @@ def print_feature_importance(feature_importance: pd.DataFrame, top_n: int = 8):
     
     for idx, row in top_features.iterrows():
         print(f"   {row['Признак']:35} {row['Коэффициент']:10.4f}")
-    
-    print(f"\n   💡 Коэффициенты показывают влияние признака на целевую переменную")
-    print(f"   (положительные - увеличивают, отрицательные - уменьшают)")
+ 
+   

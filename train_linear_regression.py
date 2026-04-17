@@ -41,6 +41,21 @@ def main():
     save_metrics(metrics, 'linear_regression')
     importance.to_csv('metrics/linear_regression_features.csv', index=False)
 
+def print_equation(model, features, intercept=True):
+    """Вывод уравнения линейной регрессии"""
+    print("\n📐 УРАВНЕНИЕ ЛИНЕЙНОЙ РЕГРЕССИИ:")
+    print("-" * 60)
+    
+    equation = ""
+    if intercept:
+        equation += f"{model.intercept_:.4f}"
+    
+    for name, coef in zip(features, model.coef_):
+        sign = "+" if coef >= 0 else "-"
+        equation += f" {sign} {abs(coef):.4f} * {name}"
+    
+    print(f"Смерти/д.н. = {equation}")
+    print(f"\n💡 Интерпретация: каждый признак умножается на свой коэффициент")
 
 if __name__ == "__main__":
     main()

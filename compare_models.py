@@ -4,15 +4,12 @@ import os
 import warnings
 warnings.filterwarnings('ignore')
 
-
 def load_metrics(model_name):
-    """Загрузка метрик из JSON файла"""
     file_path = f'metrics/{model_name}_metrics.json'
     if os.path.exists(file_path):
         with open(file_path, 'r') as f:
             return json.load(f)
     return None
-
 
 def main():
     print("=" * 80)
@@ -45,9 +42,9 @@ def main():
         
         best_model = comparison.iloc[0]['Модель']
         best_r2 = comparison.iloc[0]['R² (test)']
-        print(f"\n🥇 Лучшая модель: {best_model} (R² = {best_r2:.4f})")
+        print(f"\n Лучшая модель: {best_model} (R² = {best_r2:.4f})")
     else:
-        print("❌ Нет метрик для сравнения!")
+        print(" Нет метрик для сравнения!")
 
 
 if __name__ == "__main__":

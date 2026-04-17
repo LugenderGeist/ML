@@ -40,6 +40,22 @@ def main():
     save_metrics(metrics, 'catboost')
     importance.to_csv('metrics/catboost_features.csv', index=False)
 
+def print_detailed_importance(importance, top_n=15):
+    """Детальный вывод важности признаков"""
+    print("\n📊 FEATURE IMPORTANCE (CatBoost):")
+    print("=" * 70)
+    print(f"{'Признак':<35} {'Важность':>10} {'Вклад %':>10}")
+    print("-" * 70)
+    
+    total = importance['Важность'].sum()
+    for idx, row in importance.head(top_n).iterrows():
+        percent = (row['Важность'] / total) * 100
+        print(f"{row['Признак']:<35} {row['Важность']:>10.4f} {percent:>9.1f}%")
+    
+    # Сохраняем с процентами
+    importance['Вклад_процент'] = (importance['Важность'] / total)
+    importance.to_csv('metrics/catboost_features_with_percent.csv', index=False)
+    print(f"\n💾 Сохранено: metrics/catboost_features_with_percent.csv")
 
 if __name__ == "__main__":
     main()

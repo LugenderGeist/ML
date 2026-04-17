@@ -40,6 +40,20 @@ def main():
     save_metrics(metrics, 'xgboost')
     importance.to_csv('metrics/xgboost_features.csv', index=False)
 
+def print_detailed_importance(importance, top_n=15):
+    """Детальный вывод важности признаков"""
+    print("\n📊 FEATURE IMPORTANCE (XGBoost):")
+    print("=" * 70)
+    print(f"{'Признак':<35} {'Важность':>10} {'Вклад %':>10}")
+    print("-" * 70)
+    
+    total = importance['Важность'].sum()
+    for idx, row in importance.head(top_n).iterrows():
+        percent = (row['Важность'] / total) * 100
+        print(f"{row['Признак']:<35} {row['Важность']:>10.4f} {percent:>9.1f}%")
+    
+    importance['Вклад_процент'] = (importance['Важность'] / total) * 100
+    importance.to_csv('metrics/xgboost_features_with_percent.csv', index=False)
 
 if __name__ == "__main__":
     main()

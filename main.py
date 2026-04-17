@@ -101,7 +101,17 @@ def main():
     save_lr(model_lr, 'models/linear_regression.pkl')
     save_metrics(metrics_lr, 'linear_regression')
     importance_lr.to_csv('metrics/linear_regression_features.csv', index=False)
-    
+
+    # После обучения модели
+    print_equation(model, features, intercept=params['linear_regression']['fit_intercept'])
+
+    # Сохранение уравнения в файл
+    with open('models/linear_regression_equation.txt', 'w', encoding='utf-8') as f:
+        f.write(f"Смерти/д.н. = {equation}\n")
+        f.write(f"\nIntercept: {model.intercept_:.4f}\n")
+        for name, coef in zip(features, model.coef_):
+            f.write(f"{name}: {coef:.6f}\n")
+
     # ДЕРЕВО РЕШЕНИЙ 
     print("\n" + "=" * 80)
     print("🌳 ДЕРЕВО РЕШЕНИЙ")

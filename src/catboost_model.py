@@ -13,9 +13,7 @@ def train_catboost(
     params: Dict[str, Any],
     verbose: bool = False
 ) -> CatBoostRegressor:
-    """
-    Обучение модели CatBoost с валидационной выборкой
-    """
+
     print("\n🐱 Обучение CatBoost...")
     
     model = CatBoostRegressor(
@@ -26,8 +24,7 @@ def train_catboost(
         random_seed=params['random_seed'],
         verbose=verbose
     )
-    
-    # Обучаем с валидационной выборкой
+
     model.fit(
         X_train, y_train,
         eval_set=(X_val, y_val),
@@ -35,7 +32,6 @@ def train_catboost(
     )
     
     print(f"✅ Модель обучена (деревьев: {model.tree_count_})")
-    print(f"   Лучшее значение loss на валидации: {model.get_best_score()['learn'][list(model.get_best_score()['learn'].keys())[0]]:.4f}")
     
     return model
 
@@ -50,9 +46,7 @@ def evaluate_model(
     y_test: pd.Series,
     feature_names: list
 ) -> Tuple[Dict[str, Dict[str, float]], pd.DataFrame]:
-    """
-    Оценка качества модели на train, validation и test
-    """
+   
     # Предсказания
     y_train_pred = model.predict(X_train)
     y_val_pred = model.predict(X_val)
@@ -96,14 +90,10 @@ def evaluate_model(
 
 
 def save_model(model: CatBoostRegressor, save_path: str = 'models/catboost.cbm'):
-    """Сохранение модели в файл"""
     os.makedirs(os.path.dirname(save_path), exist_ok=True)
     model.save_model(save_path)
-    print(f"💾 Модель сохранена: {save_path}")
-
 
 def print_feature_importance(feature_importance: pd.DataFrame, top_n: int = 8):
-    """Вывод топ-N наиболее важных признаков"""
     print("\n📊 Топ важности признаков (CatBoost Feature Importance):")
     print("-" * 55)
     
@@ -111,6 +101,3 @@ def print_feature_importance(feature_importance: pd.DataFrame, top_n: int = 8):
     
     for idx, row in top_features.iterrows():
         print(f"   {row['Признак']:35} {row['Важность']:10.4f}")
-    
-    print(f"\n   💡 CatBoost Feature Importance показывает вклад каждого признака")
-    print(f"   (сумма всех важностей = {feature_importance['Важность'].sum():.2f})")

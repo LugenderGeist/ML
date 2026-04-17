@@ -19,11 +19,10 @@ def select_all_features(df: pd.DataFrame, target: str = 'Смерти/д.н.') -
     numeric_df = df.select_dtypes(include=[np.number])
     
     if target not in numeric_df.columns:
-        print(f"❌ Целевая переменная '{target}' не найдена!")
+        print(f" Целевая переменная '{target}' не найдена!")
         return None
     
     selected_features = [col for col in numeric_df.columns if col != target]
-    print(f"\n🎯 Используем ВСЕ числовые признаки: {len(selected_features)}")
     
     return selected_features
 
@@ -117,7 +116,7 @@ def heatmap(
     numeric_df = df.select_dtypes(include=[np.number])
     
     if numeric_df.shape[1] == 0:
-        print("❌ Нет числовых данных для построения корреляций!")
+        print(" Нет числовых данных для построения корреляций!")
         return pd.DataFrame()
     
     correlation_matrix = numeric_df.corr()
@@ -152,7 +151,7 @@ def heatmap(
     
     plt.savefig(save_path, dpi=300, bbox_inches='tight')
     plt.close()
-    print(f"✅ Тепловая карта сохранена: {save_path}")
+    print(f" Тепловая карта сохранена: {save_path}")
     
     return correlation_matrix
 
@@ -168,14 +167,14 @@ def main():
     # Загрузка данных
     file_path = 'data/cancer_reg1.csv'
     df = pd.read_csv(file_path)
-    print(f"\n✅ Данные загружены: {df.shape[0]} строк, {df.shape[1]} столбцов")
+    print(f"\n Данные загружены: {df.shape[0]} строк, {df.shape[1]} столбцов")
     
     # Удаление пропусков
     initial_rows = len(df)
     df = df.dropna()
     rows_removed = initial_rows - len(df)
     if rows_removed > 0:
-        print(f"🗑️ Удалено пропусков: {rows_removed} строк")
+        print(f" Удалено пропусков: {rows_removed} строк")
     
     # Создание папок
     os.makedirs('plots', exist_ok=True)
@@ -194,12 +193,11 @@ def main():
     features = select_all_features(df, target='Смерти/д.н.')
     
     if features is None or len(features) == 0:
-        print("❌ Нет признаков для обучения!")
+        print(" Нет признаков для обучения!")
         return
     
     with open('models/features.json', 'w', encoding='utf-8') as f:
         json.dump(features, f, indent=2, ensure_ascii=False)
-    print(f"✅ Список признаков сохранен: models/features.json")
     
     # Подготовка выборки
     X_train, X_val, X_test, y_train, y_val, y_test = split_data(
@@ -223,7 +221,7 @@ def main():
         )
         save_scaler(scaler, 'models/scaler.pkl')
     else:
-        print("\n⚠️ Нормализация отключена")
+        print("\n Нормализация отключена")
     
     # Подготовка данных
     prepared_data = {
