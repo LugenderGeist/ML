@@ -9,13 +9,12 @@ import json
 import warnings
 warnings.filterwarnings('ignore')
 
-from src.correlation_plots import plot_full_correlation_heatmap
 from src.linear_regression import train_linear_regression, evaluate_model as evaluate_lr, save_model as save_lr, print_feature_importance as print_lr_importance
 from src.decision_tree import train_decision_tree, evaluate_model as evaluate_dt, save_model as save_dt, visualize_tree, print_feature_importance as print_dt_importance
 from src.catboost_model import train_catboost, evaluate_model as evaluate_cb, save_model as save_cb, print_feature_importance as print_cb_importance
 from src.xgboost_model import train_xgboost, evaluate_model as evaluate_xgb, save_model as save_xgb, print_feature_importance as print_xgb_importance
 from src.neural_network import train_neural_network, evaluate_model as evaluate_nn, save_model as save_nn, print_feature_importance as print_nn_importance
-from src.preprocessing import normalize_features, save_scaler, add_normalization_params
+from prepare_data import normalize_features, save_scaler, add_normalization_params, heatmap
 from src.utils import save_metrics, select_all_features, prepare_data_for_training
 
 def load_params(config_path='params.yaml'):
@@ -29,7 +28,7 @@ def main():
     print("🏥 АНАЛИЗ ДАННЫХ И ОБУЧЕНИЕ МОДЕЛЕЙ")
     print("=" * 80)
     
-    # ==================== ШАГ 1: ЗАГРУЗКА ПАРАМЕТРОВ ====================
+    # Параметры
     try:
         params = load_params()
     except FileNotFoundError:
@@ -48,31 +47,26 @@ def main():
                               'activation': 'relu', 'dropout_rate': 0.2, 'patience': 20, 'random_state': 42}
         }
     
-    # ==================== ШАГ 2: ЗАГРУЗКА ДАННЫХ ====================
+    # Обработка данных
     file_path = 'data/cancer_reg1.csv'
     df = pd.read_csv(file_path)
-    
-    # ==================== ШАГ 3: УДАЛЕНИЕ ПРОПУСКОВ ====================
+
     initial_rows = len(df)
     df = df.dropna()
     rows_removed = initial_rows - len(df)
-    
-    # ==================== ШАГ 4: СОЗДАНИЕ ПАПОК ====================
+
     os.makedirs('plots', exist_ok=True)
     os.makedirs('models', exist_ok=True)
     os.makedirs('metrics', exist_ok=True)
-    
-    # ==================== ШАГ 5: ТЕПЛОВАЯ КАРТА ====================
-    plot_full_correlation_heatmap(df, save_path='plots/full_correlation.png')
 
-    # ==================== ШАГ 6: ВЫБОР ВСЕХ ПРИЗНАКОВ ====================
+    heatmap(df, save_path='plots/full_correlation.png')
+
     features = select_all_features(df, target='Смерти/д.н.')
 
     if features is None or len(features) == 0:
         print("❌ Нет признаков для обучения!")
         return
-    
-    # ==================== ШАГ 7: ПОДГОТОВКА ДАННЫХ (70/20/10) ====================
+
     X_train, X_val, X_test, y_train, y_val, y_test = prepare_data_for_training(
         df, features,
         train_size=params['general']['train_size'],
@@ -80,8 +74,7 @@ def main():
         test_size=params['general']['test_size'],
         random_state=params['general']['random_state']
     )
-    
-    # ==================== ШАГ 8: НОРМАЛИЗАЦИЯ ДАННЫХ ====================
+
     if params['preprocessing']['normalize']:
         print("\n" + "=" * 80)
         print("🔄 НОРМАЛИЗАЦИЯ ДАННЫХ")
@@ -95,9 +88,9 @@ def main():
     else:
         print("\n⚠️ Нормализация отключена")
     
-    # ==================== ШАГ 9: ОБУЧЕНИЕ МОДЕЛЕЙ ====================
+    # Обучение моделей
     
-    # 9.1 ЛИНЕЙНАЯ РЕГРЕССИЯ
+    # ЛИНЕЙНАЯ РЕГРЕССИЯ
     print("\n" + "=" * 80)
     print("📈 ЛИНЕЙНАЯ РЕГРЕССИЯ")
     print("=" * 80)
@@ -109,7 +102,7 @@ def main():
     save_metrics(metrics_lr, 'linear_regression')
     importance_lr.to_csv('metrics/linear_regression_features.csv', index=False)
     
-    # 9.2 ДЕРЕВО РЕШЕНИЙ 
+    # ДЕРЕВО РЕШЕНИЙ 
     print("\n" + "=" * 80)
     print("🌳 ДЕРЕВО РЕШЕНИЙ")
     print("=" * 80)
@@ -122,7 +115,7 @@ def main():
     save_metrics(metrics_dt, 'decision_tree')
     importance_dt.to_csv('metrics/decision_tree_features.csv', index=False)
     
-    # 9.3 CATBOOST
+    # CATBOOST
     print("\n" + "=" * 80)
     print("🐱 CATBOOST")
     print("=" * 80)
@@ -134,7 +127,7 @@ def main():
     save_metrics(metrics_cb, 'catboost')
     importance_cb.to_csv('metrics/catboost_features.csv', index=False)
     
-    # 9.4 XGBOOST
+    # XGBOOST
     print("\n" + "=" * 80)
     print("⚡ XGBOOST")
     print("=" * 80)
@@ -146,19 +139,18 @@ def main():
     save_metrics(metrics_xgb, 'xgboost')
     importance_xgb.to_csv('metrics/xgboost_features.csv', index=False)
     
-    # 9.5 НЕЙРОННАЯ СЕТЬ
+    # НЕЙРОННАЯ СЕТЬ
     print("\n" + "=" * 80)
     print("🧠 НЕЙРОННАЯ СЕТЬ")
     print("=" * 80)
-    
-    # Для нейросети передаем оригинальные данные (уже нормализованные)
+
     model_nn, _ = train_neural_network(X_train, y_train, X_val, y_val, params['neural_network'], verbose=False)
     metrics_nn, importance_nn = evaluate_nn(model_nn, X_train, X_val, X_test, y_train, y_val, y_test, features)
     print_nn_importance(importance_nn, top_n=8)
     save_nn(model_nn, 'models/neural_network.keras')
     save_metrics(metrics_nn, 'neural_network')
     
-    # ==================== ШАГ 10: СРАВНЕНИЕ МОДЕЛЕЙ ====================
+    # Сравнение моделей
     print("\n" + "=" * 80)
     print("🏆 СРАВНЕНИЕ МОДЕЛЕЙ")
     print("=" * 80)
@@ -192,7 +184,6 @@ def main():
     print("\n" + comparison.to_string(index=False))
     comparison.to_csv('metrics/models_comparison.csv', index=False)
     
-    # ==================== ИТОГИ ====================
     print("\n" + "=" * 80)
     print("✅ ГОТОВО!")
     print("=" * 80)

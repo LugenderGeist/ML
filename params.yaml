@@ -1,57 +1,44 @@
-# Общие параметры
+catboost:
+  depth: 4
+  iterations: 1000
+  l2_leaf_reg: 9.82
+  learning_rate: 0.272
+  random_seed: 42
+decision_tree:
+  max_depth: 4
+  min_samples_leaf: 10
+  min_samples_split: 50
+  random_state: 42
 general:
   random_state: 42
+  test_size: 0.1
   train_size: 0.7
   val_size: 0.2
-  test_size: 0.1
-
-# Предобработка данных
-preprocessing:
-  normalize: true
-  normalization_method: minmax  # standard, minmax, robust
-
-# Линейная регрессия
 linear_regression:
   fit_intercept: true
   positive: false
-
-# Дерево решений
-decision_tree:
-  max_depth: 4
-  min_samples_split: 50
-  min_samples_leaf: 10
+neural_network:
+  activation: relu
+  batch_size: 16
+  dropout_rate: 0.129
+  epochs: 100
+  layer_1_neurons: 192
+  layer_2_neurons: 48
+  layer_3_neurons: 64
+  learning_rate: 0.005
+  patience: 21
   random_state: 42
-
-# CatBoost
-catboost:
-  iterations: 2000
-  learning_rate: 0.05
-  depth: 9
-  l2_leaf_reg: 10.0
-  random_seed: 42
-
-# XGBoost
+preprocessing:
+  normalization_method: minmax
+  normalize: true
 xgboost:
-  n_estimators: 1500
-  learning_rate: 0.05
-  max_depth: 9
-  subsample: 0.8
-  colsample_bytree: 0.8
-  reg_alpha: 0.2
-  reg_lambda: 5.0
-  random_state: 42
+  colsample_bytree: 0.994
   early_stopping_rounds: 20
   eval_metric: rmse
-
-# Нейронная сеть
-neural_network:
-  epochs: 100
-  batch_size: 16
-  learning_rate: 0.005
-  layer_1_neurons: 120
-  layer_2_neurons: 60
-  layer_3_neurons: 30
-  activation: relu
-  dropout_rate: 0.1
-  patience: 20
+  learning_rate: 0.0872
+  max_depth: 4
+  n_estimators: 2000
   random_state: 42
+  reg_alpha: 0.808
+  reg_lambda: 1.534
+  subsample: 0.897

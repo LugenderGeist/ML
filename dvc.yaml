@@ -3,9 +3,6 @@ stages:
     cmd: python prepare_data.py
     deps:
       - data/cancer_reg1.csv
-      - src/correlation_plots.py
-      - src/preprocessing.py
-      - src/utils.py
       - params.yaml
     params:
       - general
@@ -21,9 +18,9 @@ stages:
     deps:
       - data/prepared_data.pkl
       - src/linear_regression.py
-      - src/utils.py
+      - params.yaml
     params:
-      - linear_regression  # только параметры линейной регрессии!
+      - linear_regression
     outs:
       - models/linear_regression.pkl
     metrics:
@@ -34,9 +31,9 @@ stages:
     deps:
       - data/prepared_data.pkl
       - src/decision_tree.py
-      - src/utils.py
+      - params.yaml
     params:
-      - decision_tree  # только параметры дерева!
+      - decision_tree
     outs:
       - models/decision_tree.pkl
       - plots/decision_tree.png
@@ -48,9 +45,9 @@ stages:
     deps:
       - data/prepared_data.pkl
       - src/catboost_model.py
-      - src/utils.py
+      - params.yaml
     params:
-      - catboost  # только параметры CatBoost!
+      - catboost
     outs:
       - models/catboost.cbm
     metrics:
@@ -61,9 +58,9 @@ stages:
     deps:
       - data/prepared_data.pkl
       - src/xgboost_model.py
-      - src/utils.py
+      - params.yaml
     params:
-      - xgboost  # только параметры XGBoost!
+      - xgboost
     outs:
       - models/xgboost.json
     metrics:
@@ -74,9 +71,9 @@ stages:
     deps:
       - data/prepared_data.pkl
       - src/neural_network.py
-      - src/utils.py
+      - params.yaml
     params:
-      - neural_network  # только параметры нейросети!
+      - neural_network
     outs:
       - models/neural_network.keras
     metrics:
