@@ -10,7 +10,7 @@
 Для первичного определения зависимостей можно построить тепловую карту - это удобное отображение коррелирующих между собой параметров. Сначала построена тепловая карты для всех параметров.
 
 <p align="center">
-  <img src="https://github.com/LugenderGeist/ML/blob/main/support_files/full_correlation.png" width="500">
+  <img src="https://github.com/LugenderGeist/ML/blob/main/support_files/full_correlation.png" width="900">
 </p>
 
 
@@ -177,7 +177,7 @@ CatBoost, как и XGBoost, выделяет два ключевых призн
 Также были получены графики из TensorBoard — это инструмент визуализации, который в реальном времени отображает процесс обучения нейронной сети. По сути отображает то же самое, что и гистограммы весов, но на каждой эпохе и красиво.
 
 <p align="center">
-<img src="https://github.com/LugenderGeist/ML/blob/main/support_files/denses.png" width="500">
+<img src="https://github.com/LugenderGeist/ML/blob/main/support_files/denses.png" width="900">
 </p>
 
 ## Настройка и контроль гиперпараметров
