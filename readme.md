@@ -9,7 +9,9 @@
 ## Тепловые карты
 Для первичного определения зависимостей можно построить тепловую карту - это удобное отображение коррелирующих между собой параметров. Сначала построена тепловая карты для всех параметров.
 
-<img src="https://github.com/LugenderGeist/ML/blob/main/support_files/full_correlation.png" width="500"; style="display: block; margin: 0 auto;>
+<p align="center">
+  <img src="https://github.com/LugenderGeist/ML/blob/main/support_files/full_correlation.png" width="500">
+</p>
 
 
 Далее выделены признаки, корреляция с целевой переменной у которых более 30% по модулю.
