@@ -14,7 +14,7 @@ stages:
       - models/scaler.pkl
 
   train_linear_regression:
-    cmd: python train_linear_regression.py
+    cmd: python scripts\train_linear_regression.py
     deps:
       - data/prepared_data.pkl
       - src/linear_regression.py
@@ -28,7 +28,7 @@ stages:
       - metrics/linear_regression_metrics.json
 
   train_decision_tree:
-    cmd: python train_decision_tree.py
+    cmd: python scripts\train_decision_tree.py
     deps:
       - data/prepared_data.pkl
       - src/decision_tree.py
@@ -42,7 +42,7 @@ stages:
       - metrics/decision_tree_metrics.json
 
   train_catboost:
-    cmd: python train_catboost.py
+    cmd: python scripts\train_catboost.py
     deps:
       - data/prepared_data.pkl
       - src/catboost_model.py
@@ -55,7 +55,7 @@ stages:
       - metrics/catboost_metrics.json
 
   train_xgboost:
-    cmd: python train_xgboost.py
+    cmd: python scripts\train_xgboost.py
     deps:
       - data/prepared_data.pkl
       - src/xgboost_model.py
@@ -68,7 +68,7 @@ stages:
       - metrics/xgboost_metrics.json
 
   train_neural_network:
-    cmd: python train_neural_network.py
+    cmd: python scripts\train_neural_network.py
     deps:
       - data/prepared_data.pkl
       - src/neural_network.py

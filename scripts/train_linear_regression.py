@@ -1,3 +1,7 @@
+import os
+import sys
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 import joblib
 import warnings
 warnings.filterwarnings('ignore')
@@ -5,16 +9,13 @@ warnings.filterwarnings('ignore')
 from src.linear_regression import train_linear_regression, evaluate_model, save_model, print_feature_importance
 from src.utils import save_metrics, print_metrics_table
 
-
 def load_params(config_path='params.yaml'):
     import yaml
     with open(config_path, 'r') as f:
         params = yaml.safe_load(f)
     return params
 
-
 def save_equation(model, features, intercept=True, save_path='metrics/linear_regression_equation.txt'):
-    """Сохранение уравнения линейной регрессии в файл"""
     # Формируем уравнение
     equation = ""
     if intercept:
