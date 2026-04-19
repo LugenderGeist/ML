@@ -9,7 +9,9 @@
 ## Тепловые карты
 Для первичного определения зависимостей можно построить тепловую карту - это удобное отображение коррелирующих между собой параметров. Сначала построена тепловая карты для всех параметров.
 
-<img src="https://github.com/LugenderGeist/ML/blob/main/support_files/full_correlation.png" width="500">
+<div style="text-align: center;">
+    <img src="https://github.com/LugenderGeist/ML/blob/main/support_files/full_correlation.png" width="500">
+</div>
 
 Далее выделены признаки, корреляция с целевой переменной у которых более 30% по модулю.
 
@@ -54,7 +56,7 @@
 
 Структура, получащаяся в результате обучения дерева решений представлена ниже.
 
-<img src="https://github.com/LugenderGeist/ML/blob/main/support_files/decision_tree.png" width="500">
+<img src="https://github.com/LugenderGeist/ML/blob/main/support_files/decision_tree.png">
 
 Метрики для дерева решений:
 
@@ -152,7 +154,7 @@ CatBoost, как и XGBoost, выделяет два ключевых призн
 
 Далее представлены графики кривых обучения: график потерь (loss). Значение ошибки на обучающей выборке, быстро снижается в первые эпохи и постепенно стабилизируется. Значение ошибки на валидационной выборке достаточно близки к обучающей кривой, что указывает на хорошее обобщение модели.
 
-<img src="https://github.com/LugenderGeist/ML/blob/main/support_files/neural_network_learning_curves.png" width="500">
+<img src="https://github.com/LugenderGeist/ML/blob/main/support_files/neural_network_learning_curves.png">
 
 Гистограммы весов отображают распределение значений весовых коэффициентов в каждом слое нейронной сети после завершения обучения. На графиках представлены:
 - dense_1 — веса первого скрытого слоя (64 нейрона)
@@ -161,7 +163,7 @@ CatBoost, как и XGBoost, выделяет два ключевых призн
 
 Широкое распределение на 1 слое говорит о том, что нейроны первого слоя обучаются разным признакам, сеть способна улавливать сложные зависимости. НА 2 и 3 слоях пик все ближе к 0 - регуляризация и dropout работает эффективно, многие нейроны "выключаются", предотвращая переобучение.
 
-<img src="https://github.com/LugenderGeist/ML/blob/main/support_files/neural_network_weights.png" width="500">
+<img src="https://github.com/LugenderGeist/ML/blob/main/support_files/neural_network_weights.png">
 
 Также были получены графики из TensorBoard — это инструмент визуализации, который в реальном времени отображает процесс обучения нейронной сети. По сути отображает то же самое, что и гистограммы весов, но на каждой эпохе и красиво.
 
