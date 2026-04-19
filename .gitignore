@@ -5,8 +5,7 @@ __pycache__/
 .vscode/
 
 # DVC
-.dvc/cache/
-.dvc/tmp/
+.dvc
 
 data/*.csv
 !data/*.dvc

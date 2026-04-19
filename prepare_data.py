@@ -211,7 +211,7 @@ def main():
     # Нормализация
     if params['preprocessing']['normalize']:
         print("\n" + "=" * 80)
-        print("🔄 НОРМАЛИЗАЦИЯ ДАННЫХ")
+        print(" НОРМАЛИЗАЦИЯ ДАННЫХ")
         print("=" * 80)
         print(f"   Метод: {params['preprocessing']['normalization_method']}")
         

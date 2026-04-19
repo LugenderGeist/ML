@@ -13,7 +13,7 @@ def train_decision_tree(
     y_train: pd.Series,
     params: Dict[str, Any]
 ) -> DecisionTreeRegressor:
-    print("\n🌳 Обучение дерева решений...")
+    print("\n Обучение дерева решений...")
     
     model = DecisionTreeRegressor(
         max_depth=params['max_depth'],
@@ -23,9 +23,6 @@ def train_decision_tree(
     )
     
     model.fit(X_train, y_train)
-    
-    print(f"✅ Модель обучена (глубина: {model.get_depth()}, листьев: {model.get_n_leaves()})")
-    
     return model
 
 
@@ -77,15 +74,12 @@ def evaluate_model(
         'train': train_metrics,
         'validation': val_metrics,
         'test': test_metrics
-    }
-    
+    } 
     return metrics, feature_importance
-
 
 def save_model(model: DecisionTreeRegressor, save_path: str = 'models/decision_tree.pkl'):
     os.makedirs(os.path.dirname(save_path), exist_ok=True)
     joblib.dump(model, save_path)
-
 
 def visualize_tree(
     model: DecisionTreeRegressor, 
@@ -94,7 +88,6 @@ def visualize_tree(
     save_path: str = 'plots/decision_tree.png'
 ):
     plt.figure(figsize=(20, 12))
-    
     plot_tree(
         model, 
         feature_names=feature_names,
@@ -103,15 +96,13 @@ def visualize_tree(
         fontsize=10,
         max_depth=max_depth
     )
-    
     plt.title(f'Дерево решений (первые {max_depth} уровня)', fontsize=16, pad=20)
     plt.tight_layout()
     plt.savefig(save_path, dpi=300, bbox_inches='tight')
     plt.close()
 
-
 def print_feature_importance(feature_importance: pd.DataFrame, top_n: int = 8):
-    print("\n📊 Топ важности признаков (Feature Importance):")
+    print("\n Топ важности признаков:")
     print("-" * 55)
     
     top_features = feature_importance.head(top_n)

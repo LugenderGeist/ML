@@ -30,7 +30,7 @@ def plot_learning_curves(history, save_path='plots/neural_network_learning_curve
     plt.tight_layout()
     plt.savefig(save_path, dpi=300, bbox_inches='tight')
     plt.close()
-    print(f"✅ Кривые обучения сохранены: {save_path}")
+    print(f" Кривые обучения сохранены: {save_path}")
 
 
 def plot_weight_distributions(model, save_path='plots/neural_network_weights.png'):
@@ -54,7 +54,7 @@ def plot_weight_distributions(model, save_path='plots/neural_network_weights.png
     plt.tight_layout()
     plt.savefig(save_path, dpi=300, bbox_inches='tight')
     plt.close()
-    print(f"✅ Гистограммы весов сохранены: {save_path}")
+    print(f" Гистограммы весов сохранены: {save_path}")
 
 
 def interpret_weights(model, feature_names, save_path='metrics/neural_network_interpretation.txt'):
@@ -87,7 +87,7 @@ def interpret_weights(model, feature_names, save_path='metrics/neural_network_in
 
 def main():
     print("=" * 80)
-    print("🧠 НЕЙРОННАЯ СЕТЬ")
+    print(" НЕЙРОННАЯ СЕТЬ")
     print("=" * 80)
     
     params = load_params()

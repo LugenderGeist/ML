@@ -59,6 +59,10 @@ stages:
           fit_intercept: true
           positive: false
     outs:
+    - path: metrics/linear_regression_equation.txt
+      hash: md5
+      md5: d3bc329f87794a58aa692e356ef211c9
+      size: 4659
     - path: metrics/linear_regression_metrics.json
       hash: md5
       md5: 3d43731c749fe023bedfc5f94faf2247
@@ -96,7 +100,7 @@ stages:
       size: 346
     - path: models/decision_tree.pkl
       hash: md5
-      md5: 3e993053e0f0a89cba979d8479724fba
+      md5: c497b4d6c5ef31247edbde1b3d8f284d
       size: 10721
     - path: plots/decision_tree.png
       hash: md5
@@ -132,7 +136,7 @@ stages:
       size: 348
     - path: models/catboost.cbm
       hash: md5
-      md5: 107f37295002b2cdc6ca3b8c583af84a
+      md5: 29457fba549f4e58220651ed9d345e2a
       size: 329736
   train_xgboost:
     cmd: python train_xgboost.py
@@ -184,8 +188,8 @@ stages:
       size: 873
     - path: src/neural_network.py
       hash: md5
-      md5: 4237a219b7df9745f0f19f01a1e44d60
-      size: 5751
+      md5: fab039266cc55d6e9030ac8b153be1fa
+      size: 5088
     params:
       params.yaml:
         neural_network:
@@ -202,12 +206,12 @@ stages:
     outs:
     - path: metrics/neural_network_metrics.json
       hash: md5
-      md5: be4e7fd211e907b8abc25b73cb78f78b
-      size: 347
+      md5: 2f3247cac37bc4bfda1b6879ce012072
+      size: 346
     - path: models/neural_network.keras
       hash: md5
-      md5: d5252d7a6a33b5c55c6b1e225f2e3654
-      size: 272537
+      md5: 4fd0a4f175e4dbe4c48e95192499aac9
+      size: 272540
   compare_models:
     cmd: python compare_models.py
     deps:
@@ -225,8 +229,8 @@ stages:
       size: 348
     - path: metrics/neural_network_metrics.json
       hash: md5
-      md5: be4e7fd211e907b8abc25b73cb78f78b
-      size: 347
+      md5: 2f3247cac37bc4bfda1b6879ce012072
+      size: 346
     - path: metrics/xgboost_metrics.json
       hash: md5
       md5: 39073586d44f1db5de67eb99983a9d84
@@ -234,5 +238,9 @@ stages:
     outs:
     - path: metrics/models_comparison.csv
       hash: md5
-      md5: 2a8788c060aa63dfe789879f540e5ed2
-      size: 541
+      md5: bd540b00fab87930109044466d6b04c6
+      size: 535
+    - path: metrics/models_comparison.json
+      hash: md5
+      md5: fda3c832f2fc66b09b35d70818e0185c
+      size: 1202

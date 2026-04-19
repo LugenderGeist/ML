@@ -23,6 +23,7 @@ stages:
       - linear_regression
     outs:
       - models/linear_regression.pkl
+      - metrics/linear_regression_equation.txt
     metrics:
       - metrics/linear_regression_metrics.json
 
@@ -88,4 +89,32 @@ stages:
       - metrics/xgboost_metrics.json
       - metrics/neural_network_metrics.json
     outs:
+      - metrics/models_comparison.json
       - metrics/models_comparison.csv
+
+
+plots:
+  - metrics/linear_regression_plot_data.csv:
+      x: dataset
+      y: R2
+      title: Linear Regression R²
+  - metrics/decision_tree_plot_data.csv:
+      x: dataset
+      y: R2
+      title: Decision Tree R²
+  - metrics/catboost_plot_data.csv:
+      x: dataset
+      y: R2
+      title: CatBoost R²
+  - metrics/xgboost_plot_data.csv:
+      x: dataset
+      y: R2
+      title: XGBoost R²
+  - metrics/neural_network_plot_data.csv:
+      x: dataset
+      y: R2
+      title: Neural Network R²
+  - metrics/models_comparison.json:
+      x: Модель
+      y: R²_test
+      title: Сравнение R² на тесте

@@ -14,7 +14,7 @@ def train_catboost(
     verbose: bool = False
 ) -> CatBoostRegressor:
 
-    print("\n🐱 Обучение CatBoost...")
+    print("\n Обучение CatBoost...")
     
     model = CatBoostRegressor(
         iterations=params['iterations'],
@@ -94,7 +94,7 @@ def save_model(model: CatBoostRegressor, save_path: str = 'models/catboost.cbm')
     model.save_model(save_path)
 
 def print_feature_importance(feature_importance: pd.DataFrame, top_n: int = 8):
-    print("\n📊 Топ важности признаков (CatBoost Feature Importance):")
+    print("\n Топ важности признаков:")
     print("-" * 55)
     
     top_features = feature_importance.head(top_n)

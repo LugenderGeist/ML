@@ -6,7 +6,6 @@ from sklearn.linear_model import LinearRegression
 from sklearn.metrics import r2_score, mean_squared_error, mean_absolute_error
 from typing import Tuple, Dict, Any
 
-
 def train_linear_regression(
     X_train: pd.DataFrame, 
     y_train: pd.Series,
@@ -20,11 +19,7 @@ def train_linear_regression(
     )
     
     model.fit(X_train, y_train)
-    
-    print(f"✅ Модель обучена (коэффициентов: {model.coef_.shape[0]})")
-    
     return model
-
 
 def evaluate_model(
     model: LinearRegression,
@@ -63,7 +58,7 @@ def evaluate_model(
         'MAE': mean_absolute_error(y_test, y_test_pred)
     }
     
-    # Важность признаков (коэффициенты)
+    # Важность признаков
     feature_importance = pd.DataFrame({
         'Признак': feature_names,
         'Коэффициент': model.coef_
@@ -75,22 +70,18 @@ def evaluate_model(
         'validation': val_metrics,
         'test': test_metrics
     }
-    
     return metrics, feature_importance
 
 
 def save_model(model: LinearRegression, save_path: str = 'models/linear_regression.pkl'):
-    """Сохранение модели в файл"""
     os.makedirs(os.path.dirname(save_path), exist_ok=True)
     joblib.dump(model, save_path)
 
-
 def print_feature_importance(feature_importance: pd.DataFrame, top_n: int = 8):
-    print("\n📊 Топ важности признаков (Коэффициенты):")
+    print("\n Топ важности признаков:")
     print("-" * 55)
     
     top_features = feature_importance.head(top_n)
-    
     for idx, row in top_features.iterrows():
         print(f"   {row['Признак']:35} {row['Коэффициент']:10.4f}")
  

@@ -32,14 +32,13 @@ def build_neural_network(input_dim: int, params: Dict[str, Any]) -> keras.Model:
     )
     return model
 
-
 def train_neural_network(
     X_train, y_train, X_val, y_val,
     params: Dict[str, Any],
     verbose: bool = True,
     use_tensorboard: bool = True
 ) -> Tuple[keras.Model, object]:
-    print("\n🧠 Обучение нейронной сети...")
+    print("\n Обучение нейронной сети...")
     set_seed(params.get('random_state', 42))
 
     model = build_neural_network(X_train.shape[1], params)
@@ -71,7 +70,7 @@ def train_neural_network(
         log_dir = os.path.join(temp_dir, 'tensorboard_logs')
         os.makedirs(log_dir, exist_ok=True)
         
-        print(f"\n📊 TensorBoard логи будут сохранены во временную папку:")
+        print(f"\n TensorBoard логи будут сохранены во временную папку:")
         print(f"   {log_dir}")
         print(f"   Для просмотра выполните в отдельном терминале:")
         print(f"   tensorboard --logdir={log_dir}")
@@ -94,9 +93,8 @@ def train_neural_network(
         verbose=1 if verbose else 0
     )
 
-    print(f"✅ Обучение завершено")
+    print(f" Обучение завершено")
     return model, history
-
 
 def evaluate_model(model, X_train, X_val, X_test, y_train, y_val, y_test, feature_names):
     y_train_pred = model.predict(X_train, verbose=0).flatten()
@@ -123,14 +121,12 @@ def evaluate_model(model, X_train, X_val, X_test, y_train, y_val, y_test, featur
     feature_importance = pd.DataFrame({'Признак': feature_names, 'Важность': 0})
     return metrics, feature_importance
 
-
 def save_model(model, save_path: str = 'models/neural_network.keras'):
     os.makedirs(os.path.dirname(save_path), exist_ok=True)
     model.save(save_path)
-    print(f"💾 Модель сохранена: {save_path}")
-
+    print(f" Модель сохранена: {save_path}")
 
 def print_feature_importance(feature_importance, top_n=8):
-    print("\n📊 Информация о признаках (нейросеть):")
+    print("\n Информация о признаках:")
     print("-" * 55)
-    print("   ⚠️ Важность признаков для нейросети не интерпретируется.")
+    print(" Важность признаков для нейросети не интерпретируется.")

@@ -14,7 +14,7 @@ def train_xgboost(
     verbose: bool = False
 ) -> xgb.XGBRegressor:
 
-    print("\n⚡ Обучение XGBoost...")
+    print("\n Обучение XGBoost...")
     
     model = xgb.XGBRegressor(
         n_estimators=params['n_estimators'],
@@ -36,9 +36,7 @@ def train_xgboost(
         eval_set=[(X_val, y_val)],
         verbose=False
     )
-    
     return model
-
 
 def evaluate_model(
     model: xgb.XGBRegressor,
@@ -99,7 +97,7 @@ def save_model(model: xgb.XGBRegressor, save_path: str = 'models/xgboost.json'):
 
 def print_feature_importance(feature_importance: pd.DataFrame, top_n: int = 8):
     
-    print("\n📊 Топ важности признаков (XGBoost Feature Importance):")
+    print("\n Топ важности признаков:")
     print("-" * 55)
     
     top_features = feature_importance.head(top_n)

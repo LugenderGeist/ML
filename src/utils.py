@@ -21,7 +21,7 @@ def save_metrics(metrics: dict, model_name: str, save_path: str = 'metrics/'):
     with open(f'{save_path}/{model_name}_metrics.json', 'w', encoding='utf-8') as f:
         json.dump(metrics_serializable, f, indent=2, ensure_ascii=False)
     
-    print(f"✅ Метрики сохранены: {save_path}/{model_name}_metrics.json")
+    print(f" Метрики сохранены: {save_path}/{model_name}_metrics.json")
 
 
 def print_metrics_table(metrics: dict, model_name: str):

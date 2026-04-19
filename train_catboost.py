@@ -42,7 +42,7 @@ def main():
 
 def print_detailed_importance(importance, top_n=15):
     """Детальный вывод важности признаков"""
-    print("\n📊 FEATURE IMPORTANCE (CatBoost):")
+    print("\n FEATURE IMPORTANCE (CatBoost):")
     print("=" * 70)
     print(f"{'Признак':<35} {'Важность':>10} {'Вклад %':>10}")
     print("-" * 70)
@@ -55,7 +55,7 @@ def print_detailed_importance(importance, top_n=15):
     # Сохраняем с процентами
     importance['Вклад_процент'] = (importance['Важность'] / total)
     importance.to_csv('metrics/catboost_features_with_percent.csv', index=False)
-    print(f"\n💾 Сохранено: metrics/catboost_features_with_percent.csv")
+    print(f"\n Сохранено: metrics/catboost_features_with_percent.csv")
 
 if __name__ == "__main__":
     main()

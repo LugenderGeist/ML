@@ -42,7 +42,7 @@ def main():
 
 def print_detailed_importance(importance, top_n=15):
     """Детальный вывод важности признаков"""
-    print("\n📊 FEATURE IMPORTANCE (XGBoost):")
+    print("\n FEATURE IMPORTANCE (XGBoost):")
     print("=" * 70)
     print(f"{'Признак':<35} {'Важность':>10} {'Вклад %':>10}")
     print("-" * 70)
