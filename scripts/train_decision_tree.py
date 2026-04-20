@@ -1,6 +1,6 @@
 import os
 import sys
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.append('C:/Users/Александра/vs_code/ML')
 
 import pandas as pd
 import joblib

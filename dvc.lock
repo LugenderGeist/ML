@@ -9,8 +9,8 @@ stages:
       size: 406438
     - path: params.yaml
       hash: md5
-      md5: 2db66f9829f0bcc185d8bee86779c3ce
-      size: 873
+      md5: 996850f26fc3c3e7dd1f0b1244f56625
+      size: 875
     params:
       params.yaml:
         general:
@@ -19,12 +19,12 @@ stages:
           train_size: 0.7
           val_size: 0.2
         preprocessing:
-          normalization_method: minmax
+          normalization_method: standard
           normalize: true
     outs:
     - path: data/prepared_data.pkl
       hash: md5
-      md5: 0189a3f13455c04a9f5352c4e70dcec3
+      md5: d52b2d936b8d20f421406f18bab0881a
       size: 908134
     - path: models/features.json
       hash: md5
@@ -32,27 +32,27 @@ stages:
       size: 1499
     - path: models/scaler.pkl
       hash: md5
-      md5: 3ab8346904beea6eb5815c4c4bfb3504
-      size: 3759
+      md5: d7963accdb1172c1c9cdee432928ddbd
+      size: 3087
     - path: plots/full_correlation.png
       hash: md5
       md5: 8d33a8f24bd5bc77d1bdc0f140c95bd9
       size: 2549020
   train_linear_regression:
-    cmd: python train_linear_regression.py
+    cmd: python scripts\train_linear_regression.py
     deps:
     - path: data/prepared_data.pkl
       hash: md5
-      md5: 0189a3f13455c04a9f5352c4e70dcec3
+      md5: d52b2d936b8d20f421406f18bab0881a
       size: 908134
     - path: params.yaml
       hash: md5
-      md5: 2db66f9829f0bcc185d8bee86779c3ce
-      size: 873
+      md5: 996850f26fc3c3e7dd1f0b1244f56625
+      size: 875
     - path: src/linear_regression.py
       hash: md5
-      md5: 55461ac0731d83e91e8d15f6704dca32
-      size: 3064
+      md5: 76b980e7dfa1e1d5a36053e5bd69e981
+      size: 4576
     params:
       params.yaml:
         linear_regression:
@@ -61,31 +61,31 @@ stages:
     outs:
     - path: metrics/linear_regression_equation.txt
       hash: md5
-      md5: d3bc329f87794a58aa692e356ef211c9
-      size: 4659
+      md5: 7c76509da333bdf9e08b2f92e099268e
+      size: 4503
     - path: metrics/linear_regression_metrics.json
       hash: md5
-      md5: 3d43731c749fe023bedfc5f94faf2247
+      md5: 38b324b2f81e54610b0e7bb47722e891
       size: 348
     - path: models/linear_regression.pkl
       hash: md5
-      md5: 610c8b6bc46418c08db4ec55c33639e9
+      md5: 6669d32ab97ce4498814e15ac9af2c11
       size: 2720
   train_decision_tree:
-    cmd: python train_decision_tree.py
+    cmd: python scripts\train_decision_tree.py
     deps:
     - path: data/prepared_data.pkl
       hash: md5
-      md5: 0189a3f13455c04a9f5352c4e70dcec3
+      md5: d52b2d936b8d20f421406f18bab0881a
       size: 908134
     - path: params.yaml
       hash: md5
-      md5: 2db66f9829f0bcc185d8bee86779c3ce
-      size: 873
+      md5: 996850f26fc3c3e7dd1f0b1244f56625
+      size: 875
     - path: src/decision_tree.py
       hash: md5
-      md5: 9ad4694dc78982404bd1d694f644527b
-      size: 3726
+      md5: ca5786f00c5d11f745ad53181b0c16ac
+      size: 3537
     params:
       params.yaml:
         decision_tree:
@@ -100,27 +100,27 @@ stages:
       size: 346
     - path: models/decision_tree.pkl
       hash: md5
-      md5: c497b4d6c5ef31247edbde1b3d8f284d
+      md5: db1f1947c50443067be027463dc34695
       size: 10721
     - path: plots/decision_tree.png
       hash: md5
-      md5: 314dd4db5f4fd70e6dd49f15e8a28a38
-      size: 910117
+      md5: 51b3ebe2186aa48f5e4037cf91108b95
+      size: 912894
   train_catboost:
-    cmd: python train_catboost.py
+    cmd: python scripts\train_catboost.py
     deps:
     - path: data/prepared_data.pkl
       hash: md5
-      md5: 0189a3f13455c04a9f5352c4e70dcec3
+      md5: d52b2d936b8d20f421406f18bab0881a
       size: 908134
     - path: params.yaml
       hash: md5
-      md5: 2db66f9829f0bcc185d8bee86779c3ce
-      size: 873
+      md5: 996850f26fc3c3e7dd1f0b1244f56625
+      size: 875
     - path: src/catboost_model.py
       hash: md5
-      md5: c388d5c710d49f8295ae6895f619a538
-      size: 3178
+      md5: bbc16af9e0a80697af384d90edd51722
+      size: 3140
     params:
       params.yaml:
         catboost:
@@ -132,27 +132,27 @@ stages:
     outs:
     - path: metrics/catboost_metrics.json
       hash: md5
-      md5: 838102bebaf009889b85d5dd78fbc99a
-      size: 348
+      md5: 7a6cf2f2b74a61821525343558dd1d10
+      size: 347
     - path: models/catboost.cbm
       hash: md5
-      md5: 29457fba549f4e58220651ed9d345e2a
+      md5: a08986fa659406454dd29c19e0787f48
       size: 329736
   train_xgboost:
-    cmd: python train_xgboost.py
+    cmd: python scripts\train_xgboost.py
     deps:
     - path: data/prepared_data.pkl
       hash: md5
-      md5: 0189a3f13455c04a9f5352c4e70dcec3
+      md5: d52b2d936b8d20f421406f18bab0881a
       size: 908134
     - path: params.yaml
       hash: md5
-      md5: 2db66f9829f0bcc185d8bee86779c3ce
-      size: 873
+      md5: 996850f26fc3c3e7dd1f0b1244f56625
+      size: 875
     - path: src/xgboost_model.py
       hash: md5
-      md5: 6daedf8cb5593b9ff841dcbfc0322641
-      size: 3412
+      md5: bcf6d2f769e4995755ec1ffc9c159031
+      size: 3368
     params:
       params.yaml:
         xgboost:
@@ -173,23 +173,23 @@ stages:
       size: 350
     - path: models/xgboost.json
       hash: md5
-      md5: 474ea2e828c64f0a8c9c9383e5241633
-      size: 999388
+      md5: d903b6086324b5c18f07b5905d0d7578
+      size: 1002720
   train_neural_network:
-    cmd: python train_neural_network.py
+    cmd: python scripts\train_neural_network.py
     deps:
     - path: data/prepared_data.pkl
       hash: md5
-      md5: 0189a3f13455c04a9f5352c4e70dcec3
+      md5: d52b2d936b8d20f421406f18bab0881a
       size: 908134
     - path: params.yaml
       hash: md5
-      md5: 2db66f9829f0bcc185d8bee86779c3ce
-      size: 873
+      md5: 996850f26fc3c3e7dd1f0b1244f56625
+      size: 875
     - path: src/neural_network.py
       hash: md5
-      md5: fab039266cc55d6e9030ac8b153be1fa
-      size: 5088
+      md5: bf0e1bad2ddb85f82f60559339473ff0
+      size: 5031
     params:
       params.yaml:
         neural_network:
@@ -206,31 +206,31 @@ stages:
     outs:
     - path: metrics/neural_network_metrics.json
       hash: md5
-      md5: 2f3247cac37bc4bfda1b6879ce012072
-      size: 346
+      md5: f80e0e4ba4ca0c63be096f965703d5dd
+      size: 343
     - path: models/neural_network.keras
       hash: md5
-      md5: 4fd0a4f175e4dbe4c48e95192499aac9
-      size: 272540
+      md5: d7c9832b5a9c8782c98311713925d7c6
+      size: 272541
   compare_models:
     cmd: python compare_models.py
     deps:
     - path: metrics/catboost_metrics.json
       hash: md5
-      md5: 838102bebaf009889b85d5dd78fbc99a
-      size: 348
+      md5: 7a6cf2f2b74a61821525343558dd1d10
+      size: 347
     - path: metrics/decision_tree_metrics.json
       hash: md5
       md5: 17f2de0dab20dbe625184d528cfbe23c
       size: 346
     - path: metrics/linear_regression_metrics.json
       hash: md5
-      md5: 3d43731c749fe023bedfc5f94faf2247
+      md5: 38b324b2f81e54610b0e7bb47722e891
       size: 348
     - path: metrics/neural_network_metrics.json
       hash: md5
-      md5: 2f3247cac37bc4bfda1b6879ce012072
-      size: 346
+      md5: f80e0e4ba4ca0c63be096f965703d5dd
+      size: 343
     - path: metrics/xgboost_metrics.json
       hash: md5
       md5: 39073586d44f1db5de67eb99983a9d84
@@ -238,9 +238,9 @@ stages:
     outs:
     - path: metrics/models_comparison.csv
       hash: md5
-      md5: bd540b00fab87930109044466d6b04c6
-      size: 535
+      md5: af261bf33817ba03ae93c4661b9827d2
+      size: 533
     - path: metrics/models_comparison.json
       hash: md5
-      md5: fda3c832f2fc66b09b35d70818e0185c
-      size: 1202
+      md5: b5c866df2e456e2345879bbb660751c7
+      size: 1200

@@ -5,7 +5,7 @@ general:
   val_size: 0.2
 
 preprocessing:
-  normalization_method: minmax
+  normalization_method: standard
   normalize: true
 
 linear_regression:

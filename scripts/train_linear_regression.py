@@ -1,13 +1,15 @@
 import os
 import sys
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.append('C:/Users/Александра/vs_code/ML')
 
 import joblib
 import warnings
+import numpy as np
 warnings.filterwarnings('ignore')
 
-from src.linear_regression import train_linear_regression, evaluate_model, save_model, print_feature_importance
+from src.linear_regression import train_linear_regression, evaluate_model, save_model, get_feature_importance, print_feature_importance
 from src.utils import save_metrics, print_metrics_table
+
 
 def load_params(config_path='params.yaml'):
     import yaml
@@ -15,8 +17,9 @@ def load_params(config_path='params.yaml'):
         params = yaml.safe_load(f)
     return params
 
+
 def save_equation(model, features, intercept=True, save_path='metrics/linear_regression_equation.txt'):
-    # Формируем уравнение
+    """Сохранение уравнения линейной регрессии в файл"""
     equation = ""
     if intercept:
         equation += f"{model.intercept_:.4f}"
@@ -25,7 +28,6 @@ def save_equation(model, features, intercept=True, save_path='metrics/linear_reg
         sign = "+" if coef >= 0 else "-"
         equation += f" {sign} {abs(coef):.6f} * {name}"
     
-    # Сохраняем в файл
     with open(save_path, 'w', encoding='utf-8') as f:
         f.write("=" * 70 + "\n")
         f.write("УРАВНЕНИЕ ЛИНЕЙНОЙ РЕГРЕССИИ\n")
@@ -38,10 +40,9 @@ def save_equation(model, features, intercept=True, save_path='metrics/linear_reg
             f.write(f"{name:35} {coef:+.6f}\n")
         f.write(f"\n{'Intercept':35} {model.intercept_:+.6f}\n")
     
-    print(f" Уравнение сохранено: {save_path}")
+    print(f"✅ Уравнение сохранено: {save_path}")
     
-    # Выводим в консоль
-    print("\n УРАВНЕНИЕ ЛИНЕЙНОЙ РЕГРЕССИИ:")
+    print("\n📐 УРАВНЕНИЕ ЛИНЕЙНОЙ РЕГРЕССИИ:")
     print("-" * 60)
     print(f"Смерти/д.н. = {equation}")
     
@@ -50,7 +51,7 @@ def save_equation(model, features, intercept=True, save_path='metrics/linear_reg
 
 def main():
     print("=" * 80)
-    print(" ЛИНЕЙНАЯ РЕГРЕССИЯ")
+    print("📈 ЛИНЕЙНАЯ РЕГРЕССИЯ")
     print("=" * 80)
     
     # Загрузка параметров
@@ -72,15 +73,23 @@ def main():
     # Сохранение уравнения
     save_equation(model, features, intercept=params['linear_regression']['fit_intercept'])
     
-    # Оценка
-    metrics, importance = evaluate_model(model, X_train, X_val, X_test, y_train, y_val, y_test, features)
-    print_metrics_table(metrics, "Линейная регрессия")
-    print_feature_importance(importance, top_n=8)
+    # Расчет важности признаков (относительные вклады)
+    feature_importance = get_feature_importance(model, features)
     
-    # Сохранение
+    # Сохраняем в CSV
+    feature_importance.to_csv('metrics/linear_regression_features.csv', index=False, encoding='utf-8-sig')
+    print(f"\n✅ Важность признаков сохранена: metrics/linear_regression_features.csv")
+    
+    # Выводим в консоль
+    print_feature_importance(feature_importance, top_n=10)
+    
+    # Оценка модели
+    metrics, _ = evaluate_model(model, X_train, X_val, X_test, y_train, y_val, y_test, features)
+    print_metrics_table(metrics, "Линейная регрессия")
+    
+    # Сохранение метрик
     save_model(model, 'models/linear_regression.pkl')
     save_metrics(metrics, 'linear_regression')
-    importance.to_csv('metrics/linear_regression_features.csv', index=False)
 
 
 if __name__ == "__main__":
