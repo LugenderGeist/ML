@@ -44,7 +44,7 @@
 - positive - поиск коэффициентов только с положительным знаком.
 - fit_intercept - добавление свободного члена в уравнение.
 
-Полином, полученный с помощью линейной регрессии представлен в файле [linear_regression_equation.txt](support_files\linear_regression_equation.txt). Он представлен для ненормированных значений параметров.
+Полином, полученный с помощью линейной регрессии представлен в файле [linear_regression_equation.txt](support_files\linear_regression_equation.txt).
 
 Метрики для линейной регрессии:
 
